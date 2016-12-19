@@ -73,6 +73,8 @@ extension WebViewController {
 		let fieldBackgroundTopMargin: CGFloat = 20
 		var effectiveScrollTop: CGFloat!
 		var scrollView: UIScrollView?
+		var cancelButton: UIButton!
+		var cancelButtonWidthConstraint: NSLayoutConstraint!
 		
 		var urlField: UITextField!
 		var urlFieldFont: UIFont {
@@ -171,14 +173,27 @@ extension WebViewController {
 			self.urlField.translatesAutoresizingMaskIntoConstraints = false
 			self.addConstraints([
 				NSLayoutConstraint(item: self.urlField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: backgroundHeight),
-				NSLayoutConstraint(item: self.urlField, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: backgroundWidth - 10),
-				NSLayoutConstraint(item: self.urlField, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1.0, constant: 0),
+//				NSLayoutConstraint(item: self.urlField, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: backgroundWidth - 10),
+				NSLayoutConstraint(item: self.urlField, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: self.fieldBackgroundMargin + 5),
+//				NSLayoutConstraint(item: self.urlField, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.urlField, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: (self.fieldBackgroundTopMargin + contentHeight / 2) - (self.bounds.height / 2)),
 			])
 			self.urlField.textAlignment = .center
 			self.urlField.adjustsFontSizeToFitWidth = true
 			self.urlField.font = self.urlFieldFont
 			
+			self.cancelButton = UIButton(type: .system)
+			self.cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Cancel"), for: .normal)
+			self.addSubview(self.cancelButton)
+			self.cancelButton.translatesAutoresizingMaskIntoConstraints = false
+			self.cancelButtonWidthConstraint = NSLayoutConstraint(item: self.cancelButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 0.0)
+			self.cancelButtonWidthConstraint.isActive = false
+			self.addConstraints([
+				NSLayoutConstraint(item: self.cancelButton, attribute: .left, relatedBy: .equal, toItem: self.urlField, attribute: .right, multiplier: 1.0, constant: 5),
+				NSLayoutConstraint(item: self.cancelButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: -10),
+				NSLayoutConstraint(item: self.cancelButton, attribute: .centerY, relatedBy: .equal, toItem: self.urlField, attribute: .centerY, multiplier: 1, constant: 0),
+				self.cancelButtonWidthConstraint,
+			])
 			self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(setEditable)))
 		}
 		
