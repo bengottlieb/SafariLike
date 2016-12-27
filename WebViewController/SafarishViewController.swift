@@ -1,5 +1,5 @@
 //
-//  WebViewController.swift
+//  SafarishViewController.swift
 //  Safarish
 //
 //  Created by Ben Gottlieb on 12/18/16.
@@ -10,7 +10,7 @@ import UIKit
 import WebKit
 //import Gulliver
 
-class WebViewController: UIViewController {
+class SafarishViewController: UIViewController {
 	var titleBar: TitleBar!
 	var webView: WKWebView!
 	var url: URL?
@@ -49,7 +49,7 @@ class WebViewController: UIViewController {
 			self.titleBar.setup()
 			self.webView.scrollView.delegate = self.titleBar
 			self.webView.navigationDelegate = self
-			self.titleBar.webViewController = self
+			self.titleBar.safarishViewController = self
 		}
 	}
 	
@@ -68,7 +68,7 @@ class WebViewController: UIViewController {
 	}
 }
 
-extension WebViewController: WKNavigationDelegate {
+extension SafarishViewController: WKNavigationDelegate {
 	public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 		if (error as NSError).domain == "NSURLErrorDomain", (error as NSError).code == -1003 {		//couldn't find host, switch to google
 			guard let current = self.url, let url = URL(string: "https://www.google.com/#q=\(current.absoluteString)") else { return }
@@ -88,13 +88,13 @@ extension WebViewController: WKNavigationDelegate {
 	}
 }
 
-extension WebViewController {
+extension SafarishViewController {
 	
 	class TitleBar: UIView, UIScrollViewDelegate, UITextFieldDelegate {
 		static let maxHeight: CGFloat = 64
 		static let minHeight: CGFloat = 40
 		
-		weak var webViewController: WebViewController!
+		weak var safarishViewController: SafarishViewController!
 		var originalText: String = ""
 		var fieldBackgroundMargin: CGFloat = 10
 		var fieldBackgroundMaxMargin: CGFloat = 10
@@ -311,7 +311,7 @@ extension WebViewController {
 					components.path = ""
 				}
 				
-				self.webViewController?.didEnterURL(components.url)
+				self.safarishViewController?.didEnterURL(components.url)
 			}
 			return false
 		}

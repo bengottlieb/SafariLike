@@ -24,7 +24,7 @@ class ViewController: UIViewController {
 		super.viewDidAppear(animated)
 		
 		let url = URL(string: "https://digg.com")!
-		let wv = WebViewController(url: url)
+		let wv = SafarishViewController(url: url)
 		self.present(wv, animated: true, completion: nil)
 	}
 }
