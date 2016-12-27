@@ -31,6 +31,17 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	var webViewConfiguration = WKWebViewConfiguration()
+	var navigationBarWasHidden: Bool?
+	
+	open override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		if let nav = self.navigationController {
+			if self.navigationBarWasHidden == nil {
+				self.navigationBarWasHidden = nav.isNavigationBarHidden
+			}
+			self.navigationController?.setNavigationBarHidden(true, animated: true)
+		}
+	}
 	
 	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
@@ -70,6 +81,13 @@ open class SafarishViewController: UIViewController {
 			self.titleBar.set(url: url)
 		}
 	}
+
+	open override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		if self.navigationBarWasHidden == true {
+			self.navigationController?.setNavigationBarHidden(false, animated: animated)
+		}
+	}
 	
 	func didEnterURL(_ url: URL?) {
 		guard let url = url else { return }
@@ -77,8 +95,12 @@ open class SafarishViewController: UIViewController {
 		self.webView.load(URLRequest(url: url))
 	}
 	
-	func dismiss() {
-		self.dismiss(animated: true, completion: nil)
+	func dismiss(animated: Bool = true) {
+		if let nav = self.navigationController, nav.viewControllers.count > 1 {
+			nav.popViewController(animated: animated)
+		} else {
+			self.dismiss(animated: animated, completion: nil)
+		}
 	}
 }
 

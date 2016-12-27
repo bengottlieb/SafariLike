@@ -25,7 +25,12 @@ class ViewController: UIViewController {
 		
 		let url = URL(string: "https://digg.com")!
 		let wv = SafarishViewController(url: url)
-		self.present(wv, animated: true, completion: nil)
+		
+		if let nav = self.navigationController {
+			nav.pushViewController(wv, animated: true)
+		} else {
+			self.present(wv, animated: true, completion: nil)
+		}
 	}
 }
 
