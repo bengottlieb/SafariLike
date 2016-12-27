@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 extension SafarishViewController {
-	class TitleBarView: UIView, UIScrollViewDelegate, UITextFieldDelegate {
+	class TitleBarView: UIView {
 		static let maxHeight: CGFloat = 64
 		static let minHeight: CGFloat = 40
 		
@@ -191,7 +191,7 @@ extension SafarishViewController {
 	
 }
 
-extension SafarishViewController.TitleBarView {
+extension SafarishViewController.TitleBarView: UIScrollViewDelegate, UITextFieldDelegate {
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		if self.effectiveScrollTop == nil { self.effectiveScrollTop = -scrollView.contentInset.top }
 		let maxDelta = SafarishViewController.TitleBarView.maxHeight - SafarishViewController.TitleBarView.minHeight
@@ -225,19 +225,31 @@ extension SafarishViewController.TitleBarView {
 		}
 		return false
 	}
+	
+	public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+		if decelerate {
+			self.makeFullyVisible(animated: true)
+		}
+	}
 }
 
 extension SafarishViewController.TitleBarView {
 	func tapped() {
+		if self.displayedHeightFraction != 1.0 {
+			self.makeFullyVisible(animated: true)
+		} else {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.makeFieldEditable(true) }
+		}
+	}
+	
+	func makeFullyVisible(animated: Bool) {
 		guard let scrollView = self.scrollView else { return }
 		
 		if self.displayedHeightFraction != 1.0 {
 			let delta = (SafarishViewController.TitleBarView.maxHeight - SafarishViewController.TitleBarView.minHeight)
 			self.effectiveScrollTop = scrollView.contentOffset.y - delta
 			
-			scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: self.effectiveScrollTop), animated: true)
-		} else {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.makeFieldEditable(true) }
+			scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: self.effectiveScrollTop), animated: animated)
 		}
 	}
 	
