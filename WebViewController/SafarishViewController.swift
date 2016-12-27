@@ -76,6 +76,10 @@ open class SafarishViewController: UIViewController {
 		self.url = url
 		self.webView.load(URLRequest(url: url))
 	}
+	
+	func dismiss() {
+		self.dismiss(animated: true, completion: nil)
+	}
 }
 
 extension SafarishViewController: WKNavigationDelegate {

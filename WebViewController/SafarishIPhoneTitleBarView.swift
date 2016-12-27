@@ -22,9 +22,17 @@ extension SafarishViewController {
 		let fieldBackgroundTopMargin: CGFloat = 20
 		var effectiveScrollTop: CGFloat!
 		var editing = false
-		var cancelButtonRight: CGFloat = 60.0
+
+		let cancelButtonRight: CGFloat = 60.0
 		var cancelButtonRightConstraint: NSLayoutConstraint!
-		
+		let doneButtonLeft: CGFloat = 60.0
+		var currentDoneButtonLeft: CGFloat {
+			if !self.isDoneButtonVisible || self.isCancelButtonVisible { return -self.doneButtonLeft }
+			
+			return 0 - (self.doneButtonLeft * (1.0 - self.displayedHeightFraction) * (1.0 - self.displayedHeightFraction))
+		}
+		var doneButtonLeftConstraint: NSLayoutConstraint!
+
 		var titleHeightConstraint: NSLayoutConstraint!
 		
 		var urlFieldFont: UIFont {
@@ -33,7 +41,9 @@ extension SafarishViewController {
 		
 		var isCancelButtonVisible = false { didSet {
 			self.cancelButtonRightConstraint?.constant = self.isCancelButtonVisible ? -self.fieldBackgroundMargin : self.cancelButtonRight
-			}}
+			self.doneButtonLeftConstraint?.constant = self.currentDoneButtonLeft
+		}}
+		var isDoneButtonVisible = true { didSet { self.doneButtonLeftConstraint?.constant = self.currentDoneButtonLeft }}
 		
 		var contentHeight: CGFloat { return self.bounds.height - self.fieldBackgroundTopMargin }
 		var backgroundWidth: CGFloat { return self.bounds.width - self.fieldBackgroundMargin * 2 }
@@ -47,7 +57,13 @@ extension SafarishViewController {
 			self.currentHeight = TitleBarView.minHeight + maxDelta * self.displayedHeightFraction
 			
 			self.fieldBackground.alpha = self.displayedHeightFraction * self.displayedHeightFraction
+			self.doneButton.alpha = self.displayedHeightFraction * self.displayedHeightFraction
 			self.titleHeightConstraint.constant = self.currentHeight
+			
+			if self.isDoneButtonVisible {
+				self.doneButtonLeftConstraint.constant = self.currentDoneButtonLeft
+			}
+			
 			self.urlField.font = self.urlFieldFont
 			if self.displayedHeightFraction != 1.0 {
 				self.urlField.isUserInteractionEnabled = false
@@ -77,12 +93,21 @@ extension SafarishViewController {
 				self.cancelButtonRightConstraint,
 			])
 
+			// setup done button
+			self.addSubview(self.doneButton)
+			self.doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
+			self.doneButtonLeftConstraint = NSLayoutConstraint(item: self.doneButton, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: self.currentDoneButtonLeft)
+			self.addConstraints([
+				NSLayoutConstraint(item: self.doneButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 60),
+				NSLayoutConstraint(item: self.doneButton, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: self.fieldBackgroundTopMargin / 2),
+				self.doneButtonLeftConstraint,
+			])
 			
 			// set up field background
 			self.addSubview(self.fieldBackground)
 			self.fieldBackground.frame = CGRect(x: self.fieldBackgroundMargin, y: self.fieldBackgroundMargin + self.fieldBackgroundTopMargin, width: backgroundWidth, height: backgroundHeight)
 			self.addConstraints([
-				NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: self.fieldBackgroundMargin),
+				NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: self.doneButton, attribute: .right, multiplier: 1.0, constant: self.fieldBackgroundMargin),
 				NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self.cancelButton, attribute: .left, multiplier: 1.0, constant: -self.fieldBackgroundMargin),
 				NSLayoutConstraint(item: self.fieldBackground, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: (self.fieldBackgroundMargin + self.fieldBackgroundTopMargin)),
 				NSLayoutConstraint(item: self.fieldBackground, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: -self.fieldBackgroundMargin)
@@ -131,6 +156,14 @@ extension SafarishViewController {
 			return button
 		}()
 		
+		var doneButton: UIButton = {
+			let button = UIButton(type: .system)
+			button.setTitle(NSLocalizedString("Done", comment: "Done"), for: .normal)
+			button.translatesAutoresizingMaskIntoConstraints = false
+			
+			return button
+		}()
+		
 		var fieldBackground: UIView = {
 			let view = UIView(frame: CGRect.zero)
 			view.translatesAutoresizingMaskIntoConstraints = false
@@ -139,15 +172,6 @@ extension SafarishViewController {
 			view.backgroundColor = UIColor(white: 0.89, alpha: 1.0)
 			
 			return view
-		}()
-		
-		var urlLabel: UILabel = {
-			let label = UILabel(frame: .zero)
-			label.translatesAutoresizingMaskIntoConstraints = false
-			label.textAlignment = .center
-			label.adjustsFontSizeToFitWidth = true
-
-			return label
 		}()
 		
 		var urlField: UITextField = {
@@ -260,6 +284,10 @@ extension SafarishViewController.TitleBarView {
 	func cancelEditing() {
 		self.urlField.text = self.originalText
 		self.makeFieldEditable(false)
+	}
+
+	func done() {
+		self.safarishViewController?.dismiss()
 	}
 }
 
