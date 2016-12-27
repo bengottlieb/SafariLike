@@ -61,7 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				B562A15D1E07947900339100 /* WebViewController */,
-				B58FE34A1E06E05800C46CD8 /* SafariLike */,
+				B58FE34A1E06E05800C46CD8 /* Safarish */,
 				B58FE3491E06E05800C46CD8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,7 +74,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B58FE34A1E06E05800C46CD8 /* SafariLike */ = {
+		B58FE34A1E06E05800C46CD8 /* Safarish */ = {
 			isa = PBXGroup;
 			children = (
 				B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */,
@@ -85,7 +85,7 @@
 				B58FE3571E06E05800C46CD8 /* Info.plist */,
 				B58FE35F1E0711BB00C46CD8 /* Frameworks */,
 			);
-			path = SafariLike;
+			path = Safarish;
 			sourceTree = "<group>";
 		};
 		B58FE35F1E0711BB00C46CD8 /* Frameworks */ = {
@@ -112,7 +112,7 @@
 			dependencies = (
 			);
 			name = Safarish;
-			productName = SafariLike;
+			productName = Safarish;
 			productReference = B58FE3481E06E05800C46CD8 /* Safarish.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -297,9 +297,9 @@
 				DEVELOPMENT_TEAM = YY6CWUX533;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/SafariLike/Frameworks",
+					"$(PROJECT_DIR)/Safarish/Frameworks",
 				);
-				INFOPLIST_FILE = SafariLike/Info.plist;
+				INFOPLIST_FILE = Safarish/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.safarish;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -314,9 +314,9 @@
 				DEVELOPMENT_TEAM = YY6CWUX533;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/SafariLike/Frameworks",
+					"$(PROJECT_DIR)/Safarish/Frameworks",
 				);
-				INFOPLIST_FILE = SafariLike/Info.plist;
+				INFOPLIST_FILE = Safarish/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.safarish;
 				PRODUCT_NAME = "$(TARGET_NAME)";
