@@ -47,19 +47,16 @@ open class SafarishViewController: UIViewController {
 				])
 			self.webView.scrollView.contentInset = UIEdgeInsets(top: TitleBarView.maxHeight, left: 0, bottom: 0, right: 0)
 			
-			self.titleBar = TitleBarView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: TitleBarView.maxHeight))
+			self.titleBar = TitleBarView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: TitleBarView.maxHeight), parent: self)
 			self.view.addSubview(self.titleBar)
-			self.titleBar.translatesAutoresizingMaskIntoConstraints = false
 			self.view.addConstraints([
 				NSLayoutConstraint(item: self.titleBar, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.titleBar, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.titleBar, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
 				])
 			
-			self.titleBar.setup()
 			self.webView.scrollView.delegate = self.titleBar
 			self.webView.navigationDelegate = self
-			self.titleBar.safarishViewController = self
 		}
 	}
 	
