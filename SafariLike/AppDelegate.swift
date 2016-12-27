@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  SafariLike
+//  Safarish
 //
 //  Created by Ben Gottlieb on 12/18/16.
 //  Copyright © 2016 Stand Alone, Inc. All rights reserved.

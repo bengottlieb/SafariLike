@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B562A15F1E07947900339100 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B562A15E1E07947900339100 /* WebViewController.swift */; };
+		B562A15F1E07947900339100 /* SafarishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B562A15E1E07947900339100 /* SafarishViewController.swift */; };
 		B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */; };
 		B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34D1E06E05800C46CD8 /* ViewController.swift */; };
 		B58FE3511E06E05800C46CD8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B58FE34F1E06E05800C46CD8 /* Main.storyboard */; };
@@ -28,8 +28,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B562A15E1E07947900339100 /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
-		B58FE3481E06E05800C46CD8 /* SafariLike.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafariLike.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B562A15E1E07947900339100 /* SafarishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafarishViewController.swift; sourceTree = "<group>"; };
+		B58FE3481E06E05800C46CD8 /* Safarish.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Safarish.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B58FE34D1E06E05800C46CD8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B58FE3501E06E05800C46CD8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 		B562A15D1E07947900339100 /* WebViewController */ = {
 			isa = PBXGroup;
 			children = (
-				B562A15E1E07947900339100 /* WebViewController.swift */,
+				B562A15E1E07947900339100 /* SafarishViewController.swift */,
 			);
 			path = WebViewController;
 			sourceTree = "<group>";
@@ -69,7 +69,7 @@
 		B58FE3491E06E05800C46CD8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B58FE3481E06E05800C46CD8 /* SafariLike.app */,
+				B58FE3481E06E05800C46CD8 /* Safarish.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -98,9 +98,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B58FE3471E06E05800C46CD8 /* SafariLike */ = {
+		B58FE3471E06E05800C46CD8 /* Safarish */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B58FE35A1E06E05800C46CD8 /* Build configuration list for PBXNativeTarget "SafariLike" */;
+			buildConfigurationList = B58FE35A1E06E05800C46CD8 /* Build configuration list for PBXNativeTarget "Safarish" */;
 			buildPhases = (
 				B58FE3441E06E05800C46CD8 /* Sources */,
 				B58FE3451E06E05800C46CD8 /* Frameworks */,
@@ -111,9 +111,9 @@
 			);
 			dependencies = (
 			);
-			name = SafariLike;
+			name = Safarish;
 			productName = SafariLike;
-			productReference = B58FE3481E06E05800C46CD8 /* SafariLike.app */;
+			productReference = B58FE3481E06E05800C46CD8 /* Safarish.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -133,7 +133,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B58FE3431E06E05800C46CD8 /* Build configuration list for PBXProject "SafariLike" */;
+			buildConfigurationList = B58FE3431E06E05800C46CD8 /* Build configuration list for PBXProject "Safarish" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -146,7 +146,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B58FE3471E06E05800C46CD8 /* SafariLike */,
+				B58FE3471E06E05800C46CD8 /* Safarish */,
 			);
 		};
 /* End PBXProject section */
@@ -170,7 +170,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */,
-				B562A15F1E07947900339100 /* WebViewController.swift in Sources */,
+				B562A15F1E07947900339100 /* SafarishViewController.swift in Sources */,
 				B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -301,7 +301,7 @@
 				);
 				INFOPLIST_FILE = SafariLike/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.SafariLike;
+				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.safarish;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -318,7 +318,7 @@
 				);
 				INFOPLIST_FILE = SafariLike/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.SafariLike;
+				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.safarish;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -327,7 +327,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B58FE3431E06E05800C46CD8 /* Build configuration list for PBXProject "SafariLike" */ = {
+		B58FE3431E06E05800C46CD8 /* Build configuration list for PBXProject "Safarish" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B58FE3581E06E05800C46CD8 /* Debug */,
@@ -336,7 +336,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B58FE35A1E06E05800C46CD8 /* Build configuration list for PBXNativeTarget "SafariLike" */ = {
+		B58FE35A1E06E05800C46CD8 /* Build configuration list for PBXNativeTarget "Safarish" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B58FE35B1E06E05800C46CD8 /* Debug */,
