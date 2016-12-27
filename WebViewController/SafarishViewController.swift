@@ -8,21 +8,31 @@
 
 import UIKit
 import WebKit
-//import Gulliver
 
-class SafarishViewController: UIViewController {
+open class SafarishViewController: UIViewController {
 	var titleBar: TitleBar!
 	var webView: WKWebView!
 	var url: URL?
+	var data: Data?
 	
-	convenience init(url: URL) {
+	public convenience init(url: URL) {
 		self.init()
+		if url.isFileURL {
+			self.data = try? Data(contentsOf: url)
+		} else {
+			self.url = url
+		}
+	}
+	
+	public convenience init(data: Data, from url: URL?) {
+		self.init()
+		self.data = data
 		self.url = url
 	}
 	
 	var webViewConfiguration = WKWebViewConfiguration()
 	
-	override func viewDidLayoutSubviews() {
+	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
 		
 		if self.titleBar == nil {
@@ -34,7 +44,7 @@ class SafarishViewController: UIViewController {
 				NSLayoutConstraint(item: self.webView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.webView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.webView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0),
-			])
+				])
 			self.webView.scrollView.contentInset = UIEdgeInsets(top: TitleBar.maxHeight, left: 0, bottom: 0, right: 0)
 			
 			self.titleBar = TitleBar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: TitleBar.maxHeight))
@@ -44,8 +54,8 @@ class SafarishViewController: UIViewController {
 				NSLayoutConstraint(item: self.titleBar, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.titleBar, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.titleBar, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
-			])
-
+				])
+			
 			self.titleBar.setup()
 			self.webView.scrollView.delegate = self.titleBar
 			self.webView.navigationDelegate = self
@@ -53,9 +63,12 @@ class SafarishViewController: UIViewController {
 		}
 	}
 	
-	override func viewDidAppear(_ animated: Bool) {
+	open override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		if let url = self.url {
+		if let data = self.data {
+			self.titleBar.set(url: self.url)
+			self.webView.load(data, mimeType: "application/x-webarchive", characterEncodingName: "", baseURL: self.url ?? URL(string: "about:blank")!)
+		} else if let url = self.url {
 			self.webView.load(URLRequest(url: url))
 			self.titleBar.set(url: url)
 		}
@@ -109,7 +122,7 @@ extension SafarishViewController {
 		var cancelButtonRightConstraint: NSLayoutConstraint!
 		var isCancelButtonVisible = false { didSet {
 			self.cancelButtonRightConstraint?.constant = self.isCancelButtonVisible ? -self.fieldBackgroundMargin : self.cancelButtonRight
-		}}
+			}}
 		
 		var urlField: UITextField!
 		var urlFieldFont: UIFont {
@@ -122,7 +135,7 @@ extension SafarishViewController {
 			if self.displayedHeightFraction != 1.0 {
 				let delta = (TitleBar.maxHeight - TitleBar.minHeight)
 				self.effectiveScrollTop = scrollView.contentOffset.y - delta
-			
+				
 				scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: self.effectiveScrollTop), animated: true)
 			} else {
 				DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.makeFieldEditable(true) }
@@ -134,7 +147,7 @@ extension SafarishViewController {
 			let size = str.size()
 			let offset = ((self.urlField.bounds.width - size.width) / 2) - 2
 			let duration: TimeInterval = 0.2
-
+			
 			if editable {
 				if self.editing { return }
 				self.editing = true
@@ -157,7 +170,7 @@ extension SafarishViewController {
 				self.urlField.clearButtonMode = .never
 				self.urlField.isUserInteractionEnabled = false
 				self.cancelButton.isUserInteractionEnabled = false
-
+				
 				UIView.animate(withDuration: duration, animations: {
 					self.updateConstraintsIfNeeded()
 					self.urlField.transform = CGAffineTransform(translationX: offset + self.cancelButtonRight / 2, y: 0)
@@ -181,12 +194,12 @@ extension SafarishViewController {
 			let maxDelta = TitleBar.maxHeight - TitleBar.minHeight
 			self.currentHeight = TitleBar.minHeight + maxDelta * self.displayedHeightFraction
 			
-		//	self.fieldBackgroundMargin = self.fieldBackgroundMaxMargin * self.displayedHeightFraction
+			//	self.fieldBackgroundMargin = self.fieldBackgroundMaxMargin * self.displayedHeightFraction
 			self.fieldBackground.translatesAutoresizingMaskIntoConstraints = false
 			
 			//self.backgroundTopConstraint.constant = (self.fieldBackgroundMargin + self.fieldBackgroundTopMargin)
 			//self.backgroundBottomConstraint.constant = -self.fieldBackgroundMargin
-
+			
 			self.fieldBackground.alpha = self.displayedHeightFraction * self.displayedHeightFraction
 			self.titleHeightConstraint.constant = self.currentHeight
 			self.urlField.font = self.urlFieldFont
@@ -194,15 +207,16 @@ extension SafarishViewController {
 				self.urlField.isUserInteractionEnabled = false
 				self.urlField.textAlignment = .center
 			}
-		}}
+			}}
 		
-		func set(url: URL) {
+		func set(url: URL?) {
+			guard let url = url else { return }
 			let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
 			var name = components?.host ?? ""
 			if name.hasPrefix("www.") { name = name.substring(from: name.index(name.startIndex, offsetBy: 4)) }
 			self.urlField.text = name
 		}
-
+		
 		var titleHeightConstraint: NSLayoutConstraint!
 		var backgroundTopConstraint: NSLayoutConstraint!
 		var backgroundBottomConstraint: NSLayoutConstraint!
@@ -240,7 +254,7 @@ extension SafarishViewController {
 				NSLayoutConstraint(item: self.urlField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: backgroundHeight),
 				NSLayoutConstraint(item: self.urlField, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: self.fieldBackgroundMargin + 5),
 				NSLayoutConstraint(item: self.urlField, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: (self.fieldBackgroundTopMargin + contentHeight / 2) - (self.bounds.height / 2)),
-			])
+				])
 			self.urlField.textAlignment = .center
 			self.urlField.adjustsFontSizeToFitWidth = true
 			self.urlField.font = self.urlFieldFont
@@ -258,16 +272,16 @@ extension SafarishViewController {
 				NSLayoutConstraint(item: self.cancelButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 60),
 				NSLayoutConstraint(item: self.cancelButton, attribute: .centerY, relatedBy: .equal, toItem: self.urlField, attribute: .centerY, multiplier: 1, constant: 0),
 				self.cancelButtonRightConstraint,
-			])
-
+				])
+			
 			self.addConstraints([
 				NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: self.fieldBackgroundMargin),
 				NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self.cancelButton, attribute: .left, multiplier: 1.0, constant: -self.fieldBackgroundMargin),
 				self.backgroundTopConstraint,
 				self.backgroundBottomConstraint
-			])
+				])
 			
-
+			
 			self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapped)))
 		}
 		
