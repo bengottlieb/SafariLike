@@ -18,14 +18,15 @@ extension SafarishViewController {
 		var scrollView: UIScrollView?
 	
 		var originalText: String = ""
-		var fieldBackgroundMargin: CGFloat = 10
+		var fieldBackgroundVMargin: CGFloat = 10
+		var fieldBackgroundHMargin: CGFloat = 10
 		let fieldBackgroundTopMargin: CGFloat = 20
 		var effectiveScrollTop: CGFloat!
 		var editing = false
 
 		let cancelButtonRight: CGFloat = 60.0
 		var cancelButtonRightConstraint: NSLayoutConstraint!
-		let doneButtonLeft: CGFloat = 60.0
+		var doneButtonLeft: CGFloat = 60.0
 		var currentDoneButtonLeft: CGFloat {
 			if !self.isDoneButtonVisible || self.isCancelButtonVisible { return -self.doneButtonLeft }
 			
@@ -40,14 +41,14 @@ extension SafarishViewController {
 		}
 		
 		var isCancelButtonVisible = false { didSet {
-			self.cancelButtonRightConstraint?.constant = self.isCancelButtonVisible ? -self.fieldBackgroundMargin : self.cancelButtonRight
+			self.cancelButtonRightConstraint?.constant = self.isCancelButtonVisible ? -self.fieldBackgroundHMargin : self.cancelButtonRight
 			self.doneButtonLeftConstraint?.constant = self.currentDoneButtonLeft
 		}}
 		var isDoneButtonVisible = true { didSet { self.doneButtonLeftConstraint?.constant = self.currentDoneButtonLeft }}
 		
 		var contentHeight: CGFloat { return self.bounds.height - self.fieldBackgroundTopMargin }
-		var backgroundWidth: CGFloat { return self.bounds.width - self.fieldBackgroundMargin * 2 }
-		var backgroundHeight: CGFloat { return self.contentHeight - self.fieldBackgroundMargin * 2 }
+		var backgroundWidth: CGFloat { return self.bounds.width - self.fieldBackgroundHMargin * 2 }
+		var backgroundHeight: CGFloat { return self.contentHeight - self.fieldBackgroundVMargin * 2 }
 
 		var currentHeight = TitleBarView.maxHeight
 		var displayedHeightFraction: CGFloat = 1.0 { didSet {
@@ -61,7 +62,7 @@ extension SafarishViewController {
 			self.titleHeightConstraint.constant = self.currentHeight
 			
 			if self.isDoneButtonVisible {
-				self.doneButtonLeftConstraint.constant = self.currentDoneButtonLeft
+				self.doneButtonLeftConstraint?.constant = self.currentDoneButtonLeft
 			}
 			
 			self.urlField.font = self.urlFieldFont
@@ -73,44 +74,54 @@ extension SafarishViewController {
 		
 		convenience init(frame: CGRect, parent: SafarishViewController) {
 			self.init(frame: frame)
-			self.translatesAutoresizingMaskIntoConstraints = false
 			self.safarishViewController = parent
+			self.setup(includingCancelButton: true, includingDoneButton: true)
+		}
+		
+		func setup(includingCancelButton: Bool, includingDoneButton: Bool) {
+			self.pageBackButtonItem = UIBarButtonItem(barButtonSystemItem: .rewind, target: self, action: #selector(pageBack))
+			self.pageForwardButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(pageForward))
+
+			
+			self.translatesAutoresizingMaskIntoConstraints = false
 			self.backgroundColor = UIColor.white
 			self.contentMode = .redraw
 			self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapped)))
-			
+
 			// set up my constraints
 			self.titleHeightConstraint = NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: TitleBarView.maxHeight)
 			self.addConstraint(self.titleHeightConstraint)
 			
-			// setup cancel button
-			self.addSubview(self.cancelButton)
-			self.cancelButton.addTarget(self, action: #selector(cancelEditing), for: .touchUpInside)
-			self.cancelButtonRightConstraint = NSLayoutConstraint(item: self.cancelButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: self.isCancelButtonVisible ? -self.fieldBackgroundMargin : self.cancelButtonRight)
-			self.addConstraints([
-				NSLayoutConstraint(item: self.cancelButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 60),
-				NSLayoutConstraint(item: self.cancelButton, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: self.fieldBackgroundTopMargin / 2),
-				self.cancelButtonRightConstraint,
-			])
+			if includingCancelButton {		// setup cancel button
+				self.addSubview(self.cancelButton)
+				self.cancelButton.addTarget(self, action: #selector(cancelEditing), for: .touchUpInside)
+				self.cancelButtonRightConstraint = NSLayoutConstraint(item: self.cancelButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: self.isCancelButtonVisible ? -self.fieldBackgroundHMargin : self.cancelButtonRight)
+				self.addConstraints([
+					NSLayoutConstraint(item: self.cancelButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 60),
+					NSLayoutConstraint(item: self.cancelButton, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: self.fieldBackgroundTopMargin / 2),
+					self.cancelButtonRightConstraint,
+				])
+			}
 
-			// setup done button
-			self.addSubview(self.doneButton)
-			self.doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
-			self.doneButtonLeftConstraint = NSLayoutConstraint(item: self.doneButton, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: self.currentDoneButtonLeft)
-			self.addConstraints([
-				NSLayoutConstraint(item: self.doneButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 60),
-				NSLayoutConstraint(item: self.doneButton, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: self.fieldBackgroundTopMargin / 2),
-				self.doneButtonLeftConstraint,
-			])
+			if includingDoneButton {	// setup done button
+				self.addSubview(self.doneButton)
+				self.doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
+				self.doneButtonLeftConstraint = NSLayoutConstraint(item: self.doneButton, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: self.currentDoneButtonLeft)
+				self.addConstraints([
+					NSLayoutConstraint(item: self.doneButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 60),
+					NSLayoutConstraint(item: self.doneButton, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: self.fieldBackgroundTopMargin / 2),
+					self.doneButtonLeftConstraint,
+				])
+			}
 			
 			// set up field background
 			self.addSubview(self.fieldBackground)
-			self.fieldBackground.frame = CGRect(x: self.fieldBackgroundMargin, y: self.fieldBackgroundMargin + self.fieldBackgroundTopMargin, width: backgroundWidth, height: backgroundHeight)
+			self.fieldBackground.frame = CGRect(x: self.fieldBackgroundHMargin, y: self.fieldBackgroundVMargin + self.fieldBackgroundTopMargin, width: backgroundWidth, height: backgroundHeight)
 			self.addConstraints([
-				NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: self.doneButton, attribute: .right, multiplier: 1.0, constant: self.fieldBackgroundMargin),
-				NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self.cancelButton, attribute: .left, multiplier: 1.0, constant: -self.fieldBackgroundMargin),
-				NSLayoutConstraint(item: self.fieldBackground, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: (self.fieldBackgroundMargin + self.fieldBackgroundTopMargin)),
-				NSLayoutConstraint(item: self.fieldBackground, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: -self.fieldBackgroundMargin)
+				NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: includingDoneButton ? self.doneButton : self, attribute: includingDoneButton ? .right : .left, multiplier: 1.0, constant: self.fieldBackgroundHMargin),
+				NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: includingCancelButton ? self.cancelButton : self, attribute: includingCancelButton ? .left : .right, multiplier: 1.0, constant: -self.fieldBackgroundHMargin),
+				NSLayoutConstraint(item: self.fieldBackground, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: (self.fieldBackgroundVMargin + self.fieldBackgroundTopMargin)),
+				NSLayoutConstraint(item: self.fieldBackground, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: -self.fieldBackgroundVMargin)
 			])
 			
 			// setup field
@@ -186,9 +197,17 @@ extension SafarishViewController {
 			return field
 		}()
 		
-
+		var pageBackButtonItem: UIBarButtonItem!
+		var pageForwardButtonItem: UIBarButtonItem!
 	}
 	
+	func pageBack() {
+		
+	}
+	
+	func pageForward() {
+		
+	}
 }
 
 extension SafarishViewController.TitleBarView: UIScrollViewDelegate, UITextFieldDelegate {
