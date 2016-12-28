@@ -195,14 +195,6 @@ extension SafarishViewController {
 		}()
 		
 	}
-	
-	func pageBack() {
-		
-	}
-	
-	func pageForward() {
-		
-	}
 }
 
 extension SafarishViewController.TitleBarView: UIScrollViewDelegate, UITextFieldDelegate {

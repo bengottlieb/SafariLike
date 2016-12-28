@@ -47,7 +47,9 @@ open class SafarishViewController: UIViewController {
 	
 	func setup() {
 		self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
+        self.pageBackButtonItem.isEnabled = false
 		self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
+        self.pageForwardButtonItem.isEnabled = false
 
 		self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
 		self.ipadToolbarItems = ([ self.pageBackButtonItem, self.pageForwardButtonItem ], [])
@@ -131,7 +133,26 @@ open class SafarishViewController: UIViewController {
 	}
 }
 
+extension SafarishViewController {
+    func updateBarButtons() {
+        self.pageBackButtonItem.isEnabled = self.webView.canGoBack
+        self.pageForwardButtonItem.isEnabled = self.webView.canGoForward
+    }
+    
+    func pageBack() {
+        self.webView.goBack()
+    }
+    
+    func pageForward() {
+        self.webView.goForward()
+    }
+}
+
 extension SafarishViewController: WKNavigationDelegate {
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        self.updateBarButtons()
+    }
+    
 	public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 		if (error as NSError).domain == "NSURLErrorDomain", (error as NSError).code == -1003 {		//couldn't find host, switch to google
 			guard let current = self.url, let url = URL(string: "https://www.google.com/#q=\(current.absoluteString)") else { return }
@@ -139,10 +160,12 @@ extension SafarishViewController: WKNavigationDelegate {
 			return
 		}
 		print("Provisional load failed: \(error)")
+        self.updateBarButtons()
 	}
 	
 	public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		print("Navigation failed: \(error)")
+        self.updateBarButtons()
 	}
 	
 	public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
