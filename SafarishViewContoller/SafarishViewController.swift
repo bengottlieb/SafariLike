@@ -20,8 +20,8 @@ open class SafarishViewController: UIViewController {
 
 	open var pageBackButtonItem: UIBarButtonItem!
 	open var pageForwardButtonItem: UIBarButtonItem!
-	open var pageBackImage = UIImage(named: "safarish-page-back")
-	open var pageForwardImage = UIImage(named: "safarish-page-forward")
+	open var pageBackImage = UIImage(named: "safarish-page-back", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
+	open var pageForwardImage = UIImage(named: "safarish-page-forward", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
 
 	var titleBar: TitleBarView!
 	var webView: WKWebView!
