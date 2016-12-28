@@ -10,6 +10,10 @@ import UIKit
 import WebKit
 
 open class SafarishViewController: UIViewController {
+	deinit {
+		self.clearOut()
+	}
+	
 	override open var toolbarItems: [UIBarButtonItem]? { didSet {
 		if let items = self.toolbarItems {
 			let midpoint = items.count / 2
@@ -18,6 +22,7 @@ open class SafarishViewController: UIViewController {
 	}}
 	open var ipadToolbarItems: ([UIBarButtonItem], [UIBarButtonItem])?
 
+    open var doneButtonItem: UIBarButtonItem!
 	open var pageBackButtonItem: UIBarButtonItem!
 	open var pageForwardButtonItem: UIBarButtonItem!
 	open var pageBackImage = UIImage(named: "safarish-page-back", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
@@ -46,13 +51,25 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	func setup() {
+        let doneButton = UIButton(type: .system)
+        doneButton.setTitle(NSLocalizedString("Done", comment: "Done"), for: .normal)
+        doneButton.sizeToFit()
+        self.doneButtonItem = UIBarButtonItem(customView: doneButton)
+		self.doneButtonItem.width = doneButton.bounds.width + 4
+        doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
+        
 		self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
         self.pageBackButtonItem.isEnabled = false
 		self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
         self.pageForwardButtonItem.isEnabled = false
 
-		self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
-		self.ipadToolbarItems = ([ self.pageBackButtonItem, self.pageForwardButtonItem ], [])
+        self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
+		self.ipadToolbarItems = ([ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ], [])
+	}
+	
+	func clearOut() {
+		self.webView.scrollView.delegate = nil
+		self.webView.navigationDelegate = nil
 	}
 	
 	var webViewConfiguration = WKWebViewConfiguration()
@@ -113,6 +130,7 @@ open class SafarishViewController: UIViewController {
 
 	open override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
+		self.titleBar.makeFieldEditable(false)
 		if self.navigationBarWasHidden == true {
 			self.navigationController?.setNavigationBarHidden(false, animated: animated)
 		}
@@ -124,7 +142,12 @@ open class SafarishViewController: UIViewController {
 		self.webView.load(URLRequest(url: url))
 	}
 	
-	func dismiss(animated: Bool = true) {
+	func done() {
+		self.dismiss(animated: true)
+	}
+	
+	func dismiss(animated: Bool) {
+		self.clearOut()
 		if let nav = self.navigationController, nav.viewControllers.count > 1 {
 			nav.popViewController(animated: animated)
 		} else {

@@ -305,7 +305,7 @@ extension SafarishViewController.TitleBarView {
 	}
 
 	func done() {
-		self.safarishViewController?.dismiss()
+		self.safarishViewController?.done()
 	}
 }
 

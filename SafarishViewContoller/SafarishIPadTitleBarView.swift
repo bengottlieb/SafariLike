@@ -19,6 +19,7 @@ extension SafarishViewController {
 			self.fieldBackgroundHMargin = 100
 			
 			
+            self.updateToolbars()
 			self.setup(includingCancelButton: false, includingDoneButton: false)
 			self.addToolbars()
 		}
@@ -36,8 +37,7 @@ extension SafarishViewController {
 				NSLayoutConstraint(item: self.leftToolbar, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: self.fieldBackgroundTopMargin),
 				NSLayoutConstraint(item: self.leftToolbar, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0)
 			])
-
-		
+            
 			self.addSubview(self.rightToolbar)
 			
 			self.rightToolbar.items = self.safarishViewController.ipadToolbarItems?.1
@@ -48,9 +48,32 @@ extension SafarishViewController {
 				NSLayoutConstraint(item: self.rightToolbar, attribute: .left, relatedBy: .equal, toItem: self.fieldBackground, attribute: .right, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.rightToolbar, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: self.fieldBackgroundTopMargin),
 				NSLayoutConstraint(item: self.rightToolbar, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0)
-				])
+			])
 		}
 		
+        func updateToolbars() {
+            var leftWidth: CGFloat = 20
+            var rightWidth: CGFloat = 20
+            let defaultItemWidth: CGFloat = 44
+            
+            for item in self.safarishViewController.ipadToolbarItems?.0 ?? [] {
+                let width = item.width > 0 ? item.width : defaultItemWidth
+                leftWidth += width
+            }
+
+            for item in self.safarishViewController.ipadToolbarItems?.1 ?? [] {
+                let width = item.width > 0 ? item.width : defaultItemWidth
+                rightWidth += width
+            }
+            
+            let maxWidth = max(leftWidth, rightWidth)
+            
+            self.fieldBackgroundHMargin = maxWidth
+			self.leftToolbar.items = self.safarishViewController.ipadToolbarItems?.0
+			self.rightToolbar.items = self.safarishViewController.ipadToolbarItems?.1
+       }
+        
+        
 		override var displayedHeightFraction: CGFloat { didSet {
 			let translation = (1.0 - self.displayedHeightFraction * self.displayedHeightFraction * self.displayedHeightFraction * self.displayedHeightFraction) * self.fieldBackgroundHMargin * 0.2
 
@@ -59,7 +82,6 @@ extension SafarishViewController {
 
 			self.rightToolbar.alpha = self.displayedHeightFraction * self.displayedHeightFraction
 			self.rightToolbar.transform = CGAffineTransform(translationX: -translation, y: 0).scaledBy(x: self.displayedHeightFraction, y: self.displayedHeightFraction)
-		
 		}}
 		
 		
