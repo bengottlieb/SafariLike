@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B562A15F1E07947900339100 /* SafarishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B562A15E1E07947900339100 /* SafarishViewController.swift */; };
+		B58A9F621E13734A00BEB20D /* Safarish.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B58A9F611E13734A00BEB20D /* Safarish.xcassets */; };
 		B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */; };
 		B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34D1E06E05800C46CD8 /* ViewController.swift */; };
 		B58FE3531E06E05800C46CD8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B58FE3521E06E05800C46CD8 /* Assets.xcassets */; };
@@ -31,6 +32,7 @@
 
 /* Begin PBXFileReference section */
 		B562A15E1E07947900339100 /* SafarishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafarishViewController.swift; sourceTree = "<group>"; };
+		B58A9F611E13734A00BEB20D /* Safarish.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Safarish.xcassets; sourceTree = "<group>"; };
 		B58FE3481E06E05800C46CD8 /* Safarish.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Safarish.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B58FE34D1E06E05800C46CD8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 				B562A15E1E07947900339100 /* SafarishViewController.swift */,
 				B5C7F36A1E12FEDA00D1E245 /* SafarishIPhoneTitleBarView.swift */,
 				B5C7F3701E1335FC00D1E245 /* SafarishIPadTitleBarView.swift */,
+				B58A9F611E13734A00BEB20D /* Safarish.xcassets */,
 			);
 			path = WebViewController;
 			sourceTree = "<group>";
@@ -164,6 +167,7 @@
 			files = (
 				B5C7F36F1E132C7700D1E245 /* Main.storyboard in Resources */,
 				B58FE3531E06E05800C46CD8 /* Assets.xcassets in Resources */,
+				B58A9F621E13734A00BEB20D /* Safarish.xcassets in Resources */,
 				B5C7F36E1E132C7700D1E245 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

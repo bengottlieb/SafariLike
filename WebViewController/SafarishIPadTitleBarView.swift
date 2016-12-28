@@ -40,7 +40,6 @@ extension SafarishViewController {
 		
 			self.addSubview(self.rightToolbar)
 			
-			self.rightToolbar.items = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
 			self.rightToolbar.backgroundColor = UIColor.clear
 			self.rightToolbar.addConstraint(NSLayoutConstraint(item: self.rightToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.fieldBackgroundHMargin))
 			
