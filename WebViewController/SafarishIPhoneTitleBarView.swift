@@ -46,9 +46,7 @@ extension SafarishViewController {
 		}}
 		var isDoneButtonVisible = true { didSet { self.doneButtonLeftConstraint?.constant = self.currentDoneButtonLeft }}
 		
-        var pageBackImage = UIImage(named: "safarish-page-back")
-        var pageForwardImage = UIImage(named: "safarish-page-forward")
-        
+		
 		var contentHeight: CGFloat { return self.bounds.height - self.fieldBackgroundTopMargin }
 		var backgroundWidth: CGFloat { return self.bounds.width - self.fieldBackgroundHMargin * 2 }
 		var backgroundHeight: CGFloat { return self.contentHeight - self.fieldBackgroundVMargin * 2 }
@@ -82,10 +80,6 @@ extension SafarishViewController {
 		}
 		
 		func setup(includingCancelButton: Bool, includingDoneButton: Bool) {
-            self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
-			self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
-
-			
 			self.translatesAutoresizingMaskIntoConstraints = false
 			self.backgroundColor = UIColor.white
 			self.contentMode = .redraw
@@ -200,8 +194,6 @@ extension SafarishViewController {
 			return field
 		}()
 		
-		var pageBackButtonItem: UIBarButtonItem!
-		var pageForwardButtonItem: UIBarButtonItem!
 	}
 	
 	func pageBack() {

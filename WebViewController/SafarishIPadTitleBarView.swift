@@ -26,7 +26,8 @@ extension SafarishViewController {
 		func addToolbars() {
 			self.addSubview(self.leftToolbar)
 			
-			self.leftToolbar.items = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
+			self.leftToolbar.items = self.safarishViewController.ipadToolbarItems?.0
+			
 			self.leftToolbar.backgroundColor = UIColor.clear
 			self.leftToolbar.addConstraint(NSLayoutConstraint(item: self.leftToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.fieldBackgroundHMargin))
 			
@@ -39,6 +40,7 @@ extension SafarishViewController {
 		
 			self.addSubview(self.rightToolbar)
 			
+			self.rightToolbar.items = self.safarishViewController.ipadToolbarItems?.1
 			self.rightToolbar.backgroundColor = UIColor.clear
 			self.rightToolbar.addConstraint(NSLayoutConstraint(item: self.rightToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.fieldBackgroundHMargin))
 			

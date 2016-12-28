@@ -10,6 +10,19 @@ import UIKit
 import WebKit
 
 open class SafarishViewController: UIViewController {
+	override open var toolbarItems: [UIBarButtonItem]? { didSet {
+		if let items = self.toolbarItems {
+			let midpoint = items.count / 2
+			self.ipadToolbarItems = (Array(items[0..<midpoint]), Array(items[midpoint..<items.count]))
+		}
+	}}
+	open var ipadToolbarItems: ([UIBarButtonItem], [UIBarButtonItem])?
+
+	open var pageBackButtonItem: UIBarButtonItem!
+	open var pageForwardButtonItem: UIBarButtonItem!
+	open var pageBackImage = UIImage(named: "safarish-page-back")
+	open var pageForwardImage = UIImage(named: "safarish-page-forward")
+
 	var titleBar: TitleBarView!
 	var webView: WKWebView!
 	var url: URL?
@@ -17,6 +30,7 @@ open class SafarishViewController: UIViewController {
 	
 	public convenience init(url: URL) {
 		self.init()
+		self.setup()
 		if url.isFileURL {
 			self.data = try? Data(contentsOf: url)
 		} else {
@@ -26,8 +40,17 @@ open class SafarishViewController: UIViewController {
 	
 	public convenience init(data: Data, from url: URL?) {
 		self.init()
+		self.setup()
 		self.data = data
 		self.url = url
+	}
+	
+	func setup() {
+		self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
+		self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
+
+		self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
+		self.ipadToolbarItems = ([ self.pageBackButtonItem, self.pageForwardButtonItem ], [])
 	}
 	
 	var webViewConfiguration = WKWebViewConfiguration()
