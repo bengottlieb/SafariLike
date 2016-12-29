@@ -244,6 +244,8 @@ extension SafarishViewController.TitleBarView: UIScrollViewDelegate, UITextField
 		if decelerate {
 			self.makeFullyVisible(animated: true)
 		}
+		
+		self.effectiveScrollTop = scrollView.contentOffset.y
 	}
 }
 

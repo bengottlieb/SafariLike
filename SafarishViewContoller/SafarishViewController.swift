@@ -181,6 +181,9 @@ extension SafarishViewController {
 }
 
 extension SafarishViewController: WKNavigationDelegate {
+	public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+		self.titleBar.makeFullyVisible(animated: true)
+	}
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.updateBarButtons()
     }
