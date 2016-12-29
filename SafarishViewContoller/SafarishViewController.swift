@@ -70,6 +70,7 @@ open class SafarishViewController: UIViewController {
 	func clearOut() {
 		self.webView.scrollView.delegate = nil
 		self.webView.navigationDelegate = nil
+		self.webView.removeObserver(self, forKeyPath: "estimatedProgress")
 	}
 	
 	var webViewConfiguration = WKWebViewConfiguration()
@@ -114,6 +115,14 @@ open class SafarishViewController: UIViewController {
 			
 			self.webView.scrollView.delegate = self.titleBar
 			self.webView.navigationDelegate = self
+			
+			self.webView.addObserver(self, forKeyPath: "estimatedProgress", options: [], context: nil)
+		}
+	}
+	
+	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+		if keyPath == "estimatedProgress" {
+			self.titleBar.estimatedProgress = self.webView.estimatedProgress
 		}
 	}
 	

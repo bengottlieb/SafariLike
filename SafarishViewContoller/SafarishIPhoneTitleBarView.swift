@@ -27,6 +27,7 @@ extension SafarishViewController {
 		let cancelButtonRight: CGFloat = 60.0
 		var cancelButtonRightConstraint: NSLayoutConstraint!
 		var doneButtonLeft: CGFloat = 60.0
+		var estimatedProgress = 0.0 { didSet { self.setNeedsDisplay() }}
 		var currentDoneButtonLeft: CGFloat {
 			if !self.isDoneButtonVisible || self.isCancelButtonVisible { return -self.doneButtonLeft }
 			
@@ -151,6 +152,13 @@ extension SafarishViewController {
 			bezier.addLine(to: CGPoint(x: bounds.width, y: bounds.height - lineWidth))
 			bezier.lineWidth = lineWidth
 			bezier.stroke()
+			
+			if self.estimatedProgress != 0 && self.estimatedProgress != 1.0 {
+				let progressHeight: CGFloat = 3.0
+				let barRect = CGRect(x: 0, y: bounds.height - progressHeight, width: bounds.width * CGFloat(self.estimatedProgress), height: progressHeight)
+				self.tintColor.setFill()
+				UIRectFill(barRect)
+			}
 		}
 		
 		//=============================================================================================
