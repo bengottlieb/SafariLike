@@ -22,6 +22,7 @@ open class SafarishViewController: UIViewController {
 	}}
 	open var ipadToolbarItems: ([UIBarButtonItem], [UIBarButtonItem])?
 
+	public var forceCenteredURLBar = false
     open var doneButtonItem: UIBarButtonItem!
 	open var pageBackButtonItem: UIBarButtonItem!
 	open var pageForwardButtonItem: UIBarButtonItem!
@@ -33,13 +34,17 @@ open class SafarishViewController: UIViewController {
 	var url: URL?
 	var data: Data?
 	
-	public convenience init(url: URL) {
+	public convenience init(url: URL?) {
 		self.init()
 		self.setup()
-		if url.isFileURL {
-			self.data = try? Data(contentsOf: url)
+		if let url = url {
+			if url.isFileURL {
+				self.data = try? Data(contentsOf: url)
+			} else {
+				self.url = url
+			}
 		} else {
-			self.url = url
+			self.url = URL(string: "about:blank")!
 		}
 	}
 	
@@ -68,9 +73,10 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	func clearOut() {
-		self.webView.scrollView.delegate = nil
-		self.webView.navigationDelegate = nil
-		self.webView.removeObserver(self, forKeyPath: "estimatedProgress")
+		self.webView?.scrollView.delegate = nil
+		self.webView?.navigationDelegate = nil
+		self.webView?.removeObserver(self, forKeyPath: "estimatedProgress")
+        self.webView = nil
 	}
 	
 	var webViewConfiguration = WKWebViewConfiguration()
@@ -93,7 +99,12 @@ open class SafarishViewController: UIViewController {
 			self.webView = WKWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
 			self.view.addSubview(self.webView)
 			self.webView.translatesAutoresizingMaskIntoConstraints = false
-			self.view.addConstraints([
+            self.webView.scrollView.delegate = self.titleBar
+            self.webView.navigationDelegate = self
+            self.webView.addObserver(self, forKeyPath: "estimatedProgress", options: [], context: nil)
+
+            
+            self.view.addConstraints([
 				NSLayoutConstraint(item: self.webView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.webView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.webView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
@@ -112,12 +123,7 @@ open class SafarishViewController: UIViewController {
 				NSLayoutConstraint(item: self.titleBar, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.titleBar, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
 				])
-			
-			self.webView.scrollView.delegate = self.titleBar
-			self.webView.navigationDelegate = self
-			
-			self.webView.addObserver(self, forKeyPath: "estimatedProgress", options: [], context: nil)
-		}
+        }
 	}
 	
 	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -155,7 +161,7 @@ open class SafarishViewController: UIViewController {
 		self.dismiss(animated: true)
 	}
 	
-	func dismiss(animated: Bool) {
+	open func dismiss(animated: Bool) {
 		self.clearOut()
 		if let nav = self.navigationController, nav.viewControllers.count > 1 {
 			nav.popViewController(animated: animated)
