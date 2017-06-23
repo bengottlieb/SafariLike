@@ -72,10 +72,23 @@ open class SafarishViewController: UIViewController {
 		}
 	}
 	
+	
+	var shouldObserveEstimatedProgress: Bool = false {
+		didSet {
+			if self.shouldObserveEstimatedProgress == oldValue { return }
+			
+			if self.shouldObserveEstimatedProgress {
+				self.webView.addObserver(self, forKeyPath: "estimatedProgress", options: [], context: nil)
+			} else {
+				self.webView?.removeObserver(self, forKeyPath: "estimatedProgress")
+			}
+			
+		}
+	}
+	
 	func clearOut() {
 		self.webView?.scrollView.delegate = nil
 		self.webView?.navigationDelegate = nil
-		self.webView?.removeObserver(self, forKeyPath: "estimatedProgress")
         self.webView = nil
 	}
 	
@@ -116,7 +129,6 @@ open class SafarishViewController: UIViewController {
 			self.webView.translatesAutoresizingMaskIntoConstraints = false
             self.webView.scrollView.delegate = self.titleBar
             self.webView.navigationDelegate = self
-            self.webView.addObserver(self, forKeyPath: "estimatedProgress", options: [], context: nil)
 
             
             self.view.addConstraints([
@@ -234,13 +246,14 @@ extension SafarishViewController: WKNavigationDelegate {
 	}
 	
 	public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-		
+		self.shouldObserveEstimatedProgress = true
 	}
 	
 	public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
 		self.titleBar.makeFullyVisible(animated: true)
 	}
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+		self.shouldObserveEstimatedProgress = false
         self.updateBarButtons()
     }
     
@@ -263,6 +276,7 @@ extension SafarishViewController: WKNavigationDelegate {
 	public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		print("Navigation failed: \(error)")
         self.updateBarButtons()
+		self.shouldObserveEstimatedProgress = false
 	}
 	
 	open func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
