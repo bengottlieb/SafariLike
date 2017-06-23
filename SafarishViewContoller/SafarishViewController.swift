@@ -10,6 +10,7 @@ import UIKit
 import WebKit
 
 open class SafarishViewController: UIViewController {
+	static let blankURL = URL(string: "about:blank")!
 	deinit {
 		self.clearOut()
 	}
@@ -23,12 +24,16 @@ open class SafarishViewController: UIViewController {
 	open var ipadToolbarItems: ([UIBarButtonItem], [UIBarButtonItem])?
 
 	public var forceCenteredURLBar = false
+	public var doneButtonTitle = NSLocalizedString("Done", comment: "Done")
     open var doneButtonItem: UIBarButtonItem!
 	open var pageBackButtonItem: UIBarButtonItem!
 	open var pageForwardButtonItem: UIBarButtonItem!
 	open var pageBackImage = UIImage(named: "safarish-page-back", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
 	open var pageForwardImage = UIImage(named: "safarish-page-forward", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
-
+	open var searchStringTemplate = "https://www.google.com/#q=%@"
+	
+	public var forceHTTP = false
+	
 	var titleBar: TitleBarView!
 	var webView: WKWebView!
 	var url: URL?
@@ -36,7 +41,6 @@ open class SafarishViewController: UIViewController {
 	
 	public convenience init(url: URL?) {
 		self.init()
-		self.setup()
 		if let url = url {
 			if url.isFileURL {
 				self.data = try? Data(contentsOf: url)
@@ -44,32 +48,28 @@ open class SafarishViewController: UIViewController {
 				self.url = url
 			}
 		} else {
-			self.url = URL(string: "about:blank")!
+			self.url = SafarishViewController.blankURL
 		}
 	}
 	
 	public convenience init(data: Data, from url: URL?) {
 		self.init()
-		self.setup()
 		self.data = data
 		self.url = url
 	}
 	
-	func setup() {
-        let doneButton = UIButton(type: .system)
-        doneButton.setTitle(NSLocalizedString("Done", comment: "Done"), for: .normal)
-        doneButton.sizeToFit()
-        self.doneButtonItem = UIBarButtonItem(customView: doneButton)
-		self.doneButtonItem.width = doneButton.bounds.width + 4
-        doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
-        
-		self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
-        self.pageBackButtonItem.isEnabled = false
-		self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
-        self.pageForwardButtonItem.isEnabled = false
+	func setupToolbar() {
+		if self.doneButtonItem == nil {
+			self.doneButtonItem = UIBarButtonItem(title: self.doneButtonTitle, style: .plain, target: self, action: #selector(done))
+			
+			self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
+			self.pageBackButtonItem.isEnabled = false
+			self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
+			self.pageForwardButtonItem.isEnabled = false
 
-        self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
-		self.ipadToolbarItems = ([ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ], [])
+			self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
+			self.ipadToolbarItems = ([ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem], [])
+		}
 	}
 	
 	func clearOut() {
@@ -83,20 +83,35 @@ open class SafarishViewController: UIViewController {
 	var navigationBarWasHidden: Bool?
 	
 	open override func viewWillAppear(_ animated: Bool) {
+        self.updateNavigationBar()
 		super.viewWillAppear(animated)
-		if let nav = self.navigationController {
-			if self.navigationBarWasHidden == nil {
-				self.navigationBarWasHidden = nav.isNavigationBarHidden
-			}
-			self.navigationController?.setNavigationBarHidden(true, animated: true)
-		}
+        self.setupViews()
 	}
+    
+    func updateNavigationBar() {
+        if let nav = self.navigationController {
+            if self.navigationBarWasHidden == nil {
+                self.navigationBarWasHidden = nav.isNavigationBarHidden
+            }
+            self.navigationController?.setNavigationBarHidden(true, animated: false)
+			
+			if UIDevice.current.userInterfaceIdiom == .phone { self.navigationController?.setToolbarHidden(false, animated: true) }
+        }
+    }
 	
 	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		
+		self.setupViews()
+    }
+	
+	open func createWebView(frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
+		return WKWebView(frame: frame, configuration: configuration)
+	}
+    
+    func setupViews() {
 		if self.titleBar == nil {
-			self.webView = WKWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
+            self.setupToolbar()
+			self.webView = self.createWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
 			self.view.addSubview(self.webView)
 			self.webView.translatesAutoresizingMaskIntoConstraints = false
             self.webView.scrollView.delegate = self.titleBar
@@ -127,34 +142,51 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-		if keyPath == "estimatedProgress" {
+		if keyPath == "estimatedProgress", self.webView?.url != SafarishViewController.blankURL {
 			self.titleBar.estimatedProgress = self.webView.estimatedProgress
+			if self.webView.estimatedProgress == 1.0 { self.loadDidFinish(for: self.webView.url) }
 		}
 	}
 	
 	open override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
+        self.setupViews()
 		if let data = self.data {
-			self.titleBar.set(url: self.url)
-			self.webView.load(data, mimeType: "application/x-webarchive", characterEncodingName: "", baseURL: self.url ?? URL(string: "about:blank")!)
-		} else if let url = self.url {
+			self.titleBar?.set(url: self.url)
+            _ = self.webView?.load(data, mimeType: "application/x-webarchive", characterEncodingName: "", baseURL: self.url ?? SafarishViewController.blankURL)
+		} else if let url = self.url, url != SafarishViewController.blankURL {
 			self.webView.load(URLRequest(url: url))
 			self.titleBar.set(url: url)
+		} else {
+			self.titleBar?.beginEditingURL()
 		}
 	}
 
 	open override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		self.titleBar.makeFieldEditable(false)
-		if self.navigationBarWasHidden == true {
+		if self.navigationBarWasHidden == false {
 			self.navigationController?.setNavigationBarHidden(false, animated: animated)
 		}
 	}
 	
 	func didEnterURL(_ url: URL?) {
 		guard let url = url else { return }
-		self.url = url
-		self.webView.load(URLRequest(url: url))
+
+		if url != self.url {
+			self.forceHTTP = false
+		}
+		
+		if self.forceHTTP, url.scheme == "https", var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+			components.scheme = "http"
+			self.url = components.url
+		} else {
+			self.url = url
+		}
+		
+		DispatchQueue.main.async {
+			self.webView.load(URLRequest(url: self.url!))
+		}
 	}
 	
 	func done() {
@@ -169,6 +201,8 @@ open class SafarishViewController: UIViewController {
 			self.dismiss(animated: animated, completion: nil)
 		}
 	}
+	
+	open func loadDidFinish(for: URL?) { }
 }
 
 extension SafarishViewController {
@@ -187,6 +221,22 @@ extension SafarishViewController {
 }
 
 extension SafarishViewController: WKNavigationDelegate {
+	public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
+		decisionHandler(.allow)
+	}
+	
+	public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Swift.Void) {
+		decisionHandler(.allow)
+	}
+	
+	public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+		
+	}
+	
+	public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+		
+	}
+	
 	public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
 		self.titleBar.makeFullyVisible(animated: true)
 	}
@@ -200,6 +250,12 @@ extension SafarishViewController: WKNavigationDelegate {
 			self.webView.load(URLRequest(url: url))
 			return
 		}
+
+		if (error as NSError).domain == "NSURLErrorDomain", (error as NSError).code == -1200, !self.forceHTTP {		//SSL Error
+			self.forceHTTP = true
+			self.didEnterURL(self.url)
+			return
+		}
 		print("Provisional load failed: \(error)")
         self.updateBarButtons()
 	}
@@ -209,8 +265,7 @@ extension SafarishViewController: WKNavigationDelegate {
         self.updateBarButtons()
 	}
 	
-	public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-		
+	open func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 		completionHandler(.useCredential, challenge.proposedCredential)
 	}
 }

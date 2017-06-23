@@ -37,7 +37,10 @@ extension SafarishViewController {
             
 			self.addSubview(self.rightToolbar)
 			
-			self.rightToolbar.items = self.safarishViewController.ipadToolbarItems?.1
+			var items = Array(self.safarishViewController.ipadToolbarItems?.1.reversed()  ?? [])
+			
+			items.insert(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), at: 0)
+			self.rightToolbar.items = items
 			self.rightToolbar.backgroundColor = UIColor.clear
 			self.rightToolbar.addConstraint(NSLayoutConstraint(item: self.rightToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.fieldBackgroundMargins.right))
 			
@@ -49,8 +52,8 @@ extension SafarishViewController {
 		}
 		
         func updateToolbars() {
-            var leftWidth: CGFloat = 20
-            var rightWidth: CGFloat = 20
+            var leftWidth: CGFloat = 30
+            var rightWidth: CGFloat = 30
             let defaultItemWidth: CGFloat = 44
             
             for item in self.safarishViewController.ipadToolbarItems?.0 ?? [] {
@@ -72,6 +75,7 @@ extension SafarishViewController {
 			self.fieldBackgroundMargins.right = rightWidth
 			self.leftToolbar.items = self.safarishViewController.ipadToolbarItems?.0
 			self.rightToolbar.items = self.safarishViewController.ipadToolbarItems?.1
+			//self.rightToolbar.items = Array(self.safarishViewController.ipadToolbarItems?.1.reversed() ?? [])
        }
         
         

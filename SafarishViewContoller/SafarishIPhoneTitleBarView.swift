@@ -16,6 +16,7 @@ extension SafarishViewController {
 		
 		weak var safarishViewController: SafarishViewController!
 		var scrollView: UIScrollView?
+		var reloadButton: UIButton!
 	
 		var originalText: String = ""
 		var fieldBackgroundMargins = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
@@ -32,8 +33,8 @@ extension SafarishViewController {
 			
 			return 0 - (self.doneButtonLeft * (1.0 - self.displayedHeightFraction) * (1.0 - self.displayedHeightFraction))
 		}
+		
 		var doneButtonLeftConstraint: NSLayoutConstraint!
-
 		var titleHeightConstraint: NSLayoutConstraint!
 		
 		var urlFieldFont: UIFont {
@@ -84,7 +85,7 @@ extension SafarishViewController {
 			self.backgroundColor = UIColor.white
 			self.contentMode = .redraw
 			self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapped)))
-
+			
 			// set up my constraints
 			self.titleHeightConstraint = NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: TitleBarView.maxHeight)
 			self.addConstraint(self.titleHeightConstraint)
@@ -126,20 +127,35 @@ extension SafarishViewController {
 			self.addConstraints([
 				NSLayoutConstraint(item: self.urlField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.backgroundHeight),
 				NSLayoutConstraint(item: self.urlField, attribute: .left, relatedBy: .equal, toItem: self.fieldBackground, attribute: .left, multiplier: 1.0, constant: 0),
-				NSLayoutConstraint(item: self.urlField, attribute: .right, relatedBy: .equal, toItem: self.fieldBackground, attribute: .right, multiplier: 1.0, constant: 0),
+				NSLayoutConstraint(item: self.urlField, attribute: .right, relatedBy: .equal, toItem: self.fieldBackground, attribute: .right, multiplier: 1.0, constant: -20),
 				NSLayoutConstraint(item: self.urlField, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: (self.fieldBackgroundStatusSpacing + contentHeight / 2) - (self.bounds.height / 2)),
 				])
 			self.urlField.delegate = self
 			self.urlField.font = self.urlFieldFont
+
+			//setup reload button
+			let refreshImage = UIImage(named: "safarish-refresh", in: Bundle(for: type(of: self)), compatibleWith: nil)
+			self.reloadButton = UIButton(type: .custom)
+			self.reloadButton.translatesAutoresizingMaskIntoConstraints = false
+			self.reloadButton.setImage(refreshImage, for: .normal)
+			self.reloadButton.addTarget(self, action: #selector(reload), for: .touchUpInside)
+			self.reloadButton.showsTouchWhenHighlighted = true
+			self.addSubview(self.reloadButton)
+			self.reloadButton.addConstraints([
+				NSLayoutConstraint(item: self.reloadButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 33),
+				NSLayoutConstraint(item: self.reloadButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 33),
+			])
+			self.addConstraints([
+				NSLayoutConstraint(item: self.reloadButton, attribute: .right, relatedBy: .equal, toItem: self.fieldBackground, attribute: .right, multiplier: 1.0, constant: 0),
+				NSLayoutConstraint(item: self.reloadButton, attribute: .centerY, relatedBy: .equal, toItem: self.fieldBackground, attribute: .centerY, multiplier: 1.0, constant: 0),
+			])
+			
+			self.makeFieldEditable(false)
 		}
 		
 		
 		func set(url: URL?) {
-			guard let url = url else { return }
-			let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-			var name = components?.host ?? ""
-			if name.hasPrefix("www.") { name = name.substring(from: name.index(name.startIndex, offsetBy: 4)) }
-			self.urlField.text = name
+			self.urlField.text = url?.prettyName
 		}
 		
 		override func draw(_ rect: CGRect) {
@@ -201,6 +217,10 @@ extension SafarishViewController {
 			return field
 		}()
 		
+        
+        func beginEditingURL() {
+            self.makeFieldEditable(true)
+        }
 	}
 }
 
@@ -224,18 +244,21 @@ extension SafarishViewController.TitleBarView: UIScrollViewDelegate, UITextField
 	}
 	
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-		self.makeFieldEditable(false)
-		if let text = self.urlField.text, let url = URL(string: text) {
-			guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
-			
-			if components.scheme == nil { components.scheme = "https" }
-			if components.host == nil {
-				components.host = components.path
-				components.path = ""
-			}
-			
-			self.safarishViewController?.didEnterURL(components.url)
+		guard let text = self.urlField.text, let url = URL(string: text) else {
+			self.makeFieldEditable(false)
+			return false
 		}
+		self.makeFieldEditable(false)
+		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+		
+		if components.scheme == nil { components.scheme = self.safarishViewController.forceHTTP ? "http" : "https" }
+		if components.host == nil {
+			components.host = components.path
+			components.path = ""
+		}
+		
+		self.safarishViewController?.didEnterURL(components.url)
+
 		return false
 	}
 	
@@ -253,7 +276,7 @@ extension SafarishViewController.TitleBarView {
 		if self.displayedHeightFraction != 1.0 {
 			self.makeFullyVisible(animated: true)
 		} else {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.makeFieldEditable(true) }
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.beginEditingURL() }
 		}
 	}
 	
@@ -289,13 +312,17 @@ extension SafarishViewController.TitleBarView {
 				self.urlField.textAlignment = .left
 				self.urlField.selectAll(nil)
 				self.urlField.clearButtonMode = .whileEditing
+				UIView.animate(withDuration: 0.4) {
+					self.urlField.text = self.safarishViewController.url?.prettyURLString
+				}
 			}
 		} else {
-			if !self.editing { return }
 			self.isCancelButtonVisible = false
 			self.urlField.clearButtonMode = .never
 			self.urlField.isUserInteractionEnabled = false
 			self.cancelButton.isUserInteractionEnabled = false
+			self.urlField.text = self.safarishViewController.url?.prettyName
+			if !self.editing { return }
 			
 			UIView.animate(withDuration: duration, animations: {
 				self.updateConstraintsIfNeeded()
@@ -308,6 +335,10 @@ extension SafarishViewController.TitleBarView {
 		}
 	}
 	
+	func reload() {
+		self.safarishViewController.webView.reload()
+	}
+	
 	func cancelEditing() {
 		self.urlField.text = self.originalText
 		self.makeFieldEditable(false)
@@ -318,3 +349,18 @@ extension SafarishViewController.TitleBarView {
 	}
 }
 
+
+extension URL {
+	var prettyName: String? {
+		let components = URLComponents(url: self, resolvingAgainstBaseURL: false)
+		var name = components?.host ?? ""
+		if name.hasPrefix("www.") { name = name.substring(from: name.index(name.startIndex, offsetBy: 4)) }
+		return name
+	}
+	
+	var prettyURLString: String? {
+		let string = self.absoluteString
+		if string == "about:blank" { return "" }
+		return string
+	}
+}
