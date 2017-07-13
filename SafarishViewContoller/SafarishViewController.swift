@@ -87,6 +87,7 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	func clearOut() {
+		self.shouldObserveEstimatedProgress = false
 		self.webView?.scrollView.delegate = nil
 		self.webView?.navigationDelegate = nil
         self.webView = nil
@@ -155,7 +156,7 @@ open class SafarishViewController: UIViewController {
 	
 	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
 		if keyPath == "estimatedProgress", self.webView?.url != SafarishViewController.blankURL {
-			self.titleBar.estimatedProgress = self.webView.estimatedProgress
+			self.titleBar.estimatedProgress = self.webView?.estimatedProgress ?? 0
 			if self.webView.estimatedProgress == 1.0 { self.loadDidFinish(for: self.webView.url) }
 		}
 	}
