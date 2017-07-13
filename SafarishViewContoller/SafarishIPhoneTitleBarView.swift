@@ -80,6 +80,10 @@ extension SafarishViewController {
 			self.setup(includingCancelButton: true, includingDoneButton: true)
 		}
 		
+		func updateURLField() {
+			self.urlField.text = self.safarishViewController.currentURL?.prettyName
+		}
+		
 		func setup(includingCancelButton: Bool, includingDoneButton: Bool) {
 			self.translatesAutoresizingMaskIntoConstraints = false
 			self.backgroundColor = UIColor.white
@@ -126,7 +130,7 @@ extension SafarishViewController {
 			self.addSubview(self.urlField)
 			self.addConstraints([
 				NSLayoutConstraint(item: self.urlField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.backgroundHeight),
-				NSLayoutConstraint(item: self.urlField, attribute: .left, relatedBy: .equal, toItem: self.fieldBackground, attribute: .left, multiplier: 1.0, constant: 0),
+				NSLayoutConstraint(item: self.urlField, attribute: .left, relatedBy: .equal, toItem: self.fieldBackground, attribute: .left, multiplier: 1.0, constant: 10),
 				NSLayoutConstraint(item: self.urlField, attribute: .right, relatedBy: .equal, toItem: self.fieldBackground, attribute: .right, multiplier: 1.0, constant: -20),
 				NSLayoutConstraint(item: self.urlField, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: (self.fieldBackgroundStatusSpacing + contentHeight / 2) - (self.bounds.height / 2)),
 				])
@@ -151,11 +155,6 @@ extension SafarishViewController {
 			])
 			
 			self.makeFieldEditable(false)
-		}
-		
-		
-		func set(url: URL?) {
-			self.urlField.text = url?.prettyName
 		}
 		
 		override func draw(_ rect: CGRect) {
@@ -302,6 +301,7 @@ extension SafarishViewController.TitleBarView {
 			self.editing = true
 			self.isCancelButtonVisible = true
 			self.originalText = self.urlField.text ?? ""
+			self.urlField.text = self.safarishViewController.currentURL?.prettyURLString
 			UIView.animate(withDuration: duration, animations: {
 				self.updateConstraintsIfNeeded()
 				self.urlField.transform = CGAffineTransform(translationX: -(offset - self.cancelButtonRight / 2), y: 0)
@@ -312,22 +312,22 @@ extension SafarishViewController.TitleBarView {
 				self.urlField.textAlignment = .left
 				self.urlField.selectAll(nil)
 				self.urlField.clearButtonMode = .whileEditing
-				UIView.animate(withDuration: 0.4) {
-					self.urlField.text = self.safarishViewController.url?.prettyURLString
-				}
 			}
 		} else {
 			self.isCancelButtonVisible = false
 			self.urlField.clearButtonMode = .never
 			self.urlField.isUserInteractionEnabled = false
 			self.cancelButton.isUserInteractionEnabled = false
-			self.urlField.text = self.safarishViewController.url?.prettyName
-			if !self.editing { return }
+			if !self.editing {
+				self.urlField.text = self.safarishViewController.currentURL?.prettyName
+				return
+			}
 			
 			UIView.animate(withDuration: duration, animations: {
 				self.updateConstraintsIfNeeded()
 				self.urlField.transform = CGAffineTransform(translationX: offset + self.cancelButtonRight / 2, y: 0)
 			}) { complete in
+				self.urlField.text = self.safarishViewController.currentURL?.prettyName
 				self.urlField.transform = CGAffineTransform.identity
 				self.urlField.textAlignment = .center
 				self.editing = false

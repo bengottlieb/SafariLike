@@ -24,7 +24,7 @@ extension SafarishViewController {
 		func addToolbars() {
 			self.addSubview(self.leftToolbar)
 			
-			self.leftToolbar.items = self.safarishViewController.ipadToolbarItems?.0
+			self.leftToolbar.items = self.safarishViewController.ipadToolbarItems?.left
 			
 			self.leftToolbar.backgroundColor = UIColor.clear
 			self.leftToolbar.addConstraint(NSLayoutConstraint(item: self.leftToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.fieldBackgroundMargins.left))
@@ -37,7 +37,7 @@ extension SafarishViewController {
             
 			self.addSubview(self.rightToolbar)
 			
-			var items = Array(self.safarishViewController.ipadToolbarItems?.1.reversed()  ?? [])
+			var items = Array(self.safarishViewController.ipadToolbarItems?.right.reversed()  ?? [])
 			
 			items.insert(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), at: 0)
 			self.rightToolbar.items = items
@@ -56,12 +56,12 @@ extension SafarishViewController {
             var rightWidth: CGFloat = 30
             let defaultItemWidth: CGFloat = 44
             
-            for item in self.safarishViewController.ipadToolbarItems?.0 ?? [] {
+            for item in self.safarishViewController.ipadToolbarItems?.left ?? [] {
                 let width = item.width > 0 ? item.width : defaultItemWidth
                 leftWidth += width
             }
 
-            for item in self.safarishViewController.ipadToolbarItems?.1 ?? [] {
+            for item in self.safarishViewController.ipadToolbarItems?.right ?? [] {
                 let width = item.width > 0 ? item.width : defaultItemWidth
                 rightWidth += width
             }
@@ -73,9 +73,9 @@ extension SafarishViewController {
 			
 			self.fieldBackgroundMargins.left = leftWidth
 			self.fieldBackgroundMargins.right = rightWidth
-			self.leftToolbar.items = self.safarishViewController.ipadToolbarItems?.0
-			self.rightToolbar.items = self.safarishViewController.ipadToolbarItems?.1
-			//self.rightToolbar.items = Array(self.safarishViewController.ipadToolbarItems?.1.reversed() ?? [])
+			self.leftToolbar.items = self.safarishViewController.ipadToolbarItems?.left
+			self.rightToolbar.items = self.safarishViewController.ipadToolbarItems?.right
+			//self.rightToolbar.items = Array(self.safarishViewController.ipadToolbarItems?.right.reversed() ?? [])
        }
         
         
