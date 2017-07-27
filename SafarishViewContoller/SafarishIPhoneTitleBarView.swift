@@ -88,7 +88,7 @@ extension SafarishViewController {
 			self.translatesAutoresizingMaskIntoConstraints = false
 			self.backgroundColor = UIColor.white
 			self.contentMode = .redraw
-			self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapped)))
+			self.fieldBackground.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapped)))
 			
 			// set up my constraints
 			self.titleHeightConstraint = NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: TitleBarView.maxHeight)
@@ -198,6 +198,7 @@ extension SafarishViewController {
 			let view = UIView(frame: CGRect.zero)
 			view.translatesAutoresizingMaskIntoConstraints = false
 			view.layer.cornerRadius = 5
+			view.isUserInteractionEnabled = true
 			view.layer.masksToBounds = true
 			view.backgroundColor = UIColor(white: 0.89, alpha: 1.0)
 			
@@ -271,7 +272,7 @@ extension SafarishViewController.TitleBarView: UIScrollViewDelegate, UITextField
 }
 
 extension SafarishViewController.TitleBarView {
-	func tapped() {
+	@objc func tapped() {
 		if self.displayedHeightFraction != 1.0 {
 			self.makeFullyVisible(animated: true)
 		} else {
@@ -291,7 +292,7 @@ extension SafarishViewController.TitleBarView {
 	}
 	
 	func makeFieldEditable(_ editable: Bool) {
-		let str = NSAttributedString(string: self.urlField.text ?? "", attributes: [NSFontAttributeName: self.urlField.font!])
+		let str = NSAttributedString(string: self.urlField.text ?? "", attributes: [.font: self.urlField.font!])
 		let size = str.size()
 		let offset = ((self.urlField.bounds.width - size.width) / 2) - 2
 		let duration: TimeInterval = 0.2
@@ -335,16 +336,16 @@ extension SafarishViewController.TitleBarView {
 		}
 	}
 	
-	func reload() {
+	@objc func reload() {
 		self.safarishViewController.webView.reload()
 	}
 	
-	func cancelEditing() {
+	@objc func cancelEditing() {
 		self.urlField.text = self.originalText
 		self.makeFieldEditable(false)
 	}
 
-	func done() {
+	@objc func done() {
 		self.safarishViewController?.done()
 	}
 }

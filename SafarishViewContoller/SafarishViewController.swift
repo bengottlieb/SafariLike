@@ -39,6 +39,7 @@ open class SafarishViewController: UIViewController {
 	var url: URL? { didSet { self.titleBar?.updateURLField() }}
 	var currentURL: URL? { return self.webView?.url ?? self.url }
 	var data: Data?
+	var html: String?
 	
 	public convenience init(url: URL?) {
 		self.init()
@@ -56,6 +57,12 @@ open class SafarishViewController: UIViewController {
 	public convenience init(data: Data, from url: URL?) {
 		self.init()
 		self.data = data
+		self.url = url
+	}
+	
+	public convenience init(html: String, from url: URL?) {
+		self.init()
+		self.html = html
 		self.url = url
 	}
 	
@@ -194,6 +201,8 @@ open class SafarishViewController: UIViewController {
 		} else if let url = self.url, url != SafarishViewController.blankURL {
 			self.webView.load(URLRequest(url: url))
 			self.titleBar?.updateURLField()
+		} else if let html = self.html {
+			self.webView.loadHTMLString(html, baseURL: self.url)
 		} else {
 			self.titleBar?.beginEditingURL()
 		}
@@ -226,7 +235,7 @@ open class SafarishViewController: UIViewController {
 		}
 	}
 	
-	func done() {
+	@objc func done() {
 		self.dismiss(animated: true)
 	}
 	
@@ -248,7 +257,7 @@ extension SafarishViewController {
 		self.pageForwardButtonItem.isEnabled = self.canGoForward
 	}
 	
-    func pageBack() {
+    @objc func pageBack() {
 		if !self.webView.canGoBack {			// if we started off with a webarchive, we'll need to reload it here
 			self.loadInitialContent()
 		} else {
@@ -256,7 +265,7 @@ extension SafarishViewController {
 		}
     }
     
-    func pageForward() {
+    @objc func pageForward() {
         self.webView.goForward()
     }
 }
