@@ -23,7 +23,7 @@ class ViewController: UIViewController {
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		
-		let url = URL(string: "https://digg.com")!
+		let url = URL(string: "https://www.standalone.com")!
 		let wv = SafarishViewController(url: url)
 		
 		if let nav = self.navigationController {

@@ -36,10 +36,11 @@ open class SafarishViewController: UIViewController {
 	
 	var titleBar: TitleBarView!
 	var webView: WKWebView!
-	var url: URL? { didSet { self.titleBar?.updateURLField() }}
+	var url: URL? { didSet { self.titleView?.url = self.url }}
 	var currentURL: URL? { return self.webView?.url ?? self.url }
 	var data: Data?
 	var html: String?
+	var titleView: SafarishURLEntryField!
 	
 	public convenience init(url: URL?) {
 		self.init()
@@ -124,14 +125,14 @@ open class SafarishViewController: UIViewController {
 	}
     
     func updateNavigationBar() {
-        if let nav = self.navigationController {
-            if self.navigationBarWasHidden == nil {
-                self.navigationBarWasHidden = nav.isNavigationBarHidden
-            }
-            self.navigationController?.setNavigationBarHidden(true, animated: false)
-			
-			if UIDevice.current.userInterfaceIdiom == .phone { self.navigationController?.setToolbarHidden(false, animated: true) }
-        }
+//        if let nav = self.navigationController {
+//            if self.navigationBarWasHidden == nil {
+//                self.navigationBarWasHidden = nav.isNavigationBarHidden
+//            }
+//            self.navigationController?.setNavigationBarHidden(true, animated: false)
+//
+//			if UIDevice.current.userInterfaceIdiom == .phone { self.navigationController?.setToolbarHidden(false, animated: true) }
+//        }
     }
 	
 	open override func viewDidLayoutSubviews() {
@@ -144,8 +145,13 @@ open class SafarishViewController: UIViewController {
 	}
     
     func setupViews() {
+		self.titleView = SafarishURLEntryField(frame: CGRect(x: 0, y: 0, width: 1000, height: 44))
+		self.navigationItem.titleView = self.titleView
+		
+		self.titleView.url = self.url
+		
 		if self.titleBar == nil {
-            self.setupToolbar()
+            //self.setupToolbar()
 			self.webView = self.createWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
 			self.view.addSubview(self.webView)
 			self.webView.translatesAutoresizingMaskIntoConstraints = false
@@ -253,8 +259,8 @@ open class SafarishViewController: UIViewController {
 
 extension SafarishViewController {
 	func updateBarButtons() {
-		self.pageBackButtonItem.isEnabled = self.canGoBack
-		self.pageForwardButtonItem.isEnabled = self.canGoForward
+		self.pageBackButtonItem?.isEnabled = self.canGoBack
+		self.pageForwardButtonItem?.isEnabled = self.canGoForward
 	}
 	
     @objc func pageBack() {

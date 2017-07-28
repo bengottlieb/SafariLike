@@ -360,8 +360,12 @@ extension URL {
 	}
 	
 	var prettyURLString: String? {
-		let string = self.absoluteString
-		if string == "about:blank" { return "" }
+		var string = ""
+		if self.absoluteString == "about:blank" { return "" }
+
+		if let host = self.host, !host.isEmpty { string += host }
+		if self.path.isEmpty { string += "/" + self.path}
+		
 		return string
 	}
 }
