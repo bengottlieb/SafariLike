@@ -9,7 +9,7 @@
 import UIKit
 
 class SafarishNavigationTitleView: UIView {
-	var estimatedProgress: CGFloat?
+	var estimatedProgress: CGFloat? { didSet { self.setNeedsDisplay() }}
 	
 	var urlField: SafarishURLEntryField!
 	var parent: SafarishViewController!

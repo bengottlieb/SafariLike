@@ -13,6 +13,9 @@ class SafarishURLEntryField: UIView {
 	var label: UILabel!
 	var labelCenterConstraint: NSLayoutConstraint!
 	var labelLeftConstraint: NSLayoutConstraint!
+	var backgroundRightConstraint: NSLayoutConstraint!
+	var cancelButton: UIButton!
+	var shouldShowCancelButton: Bool { return !self.safarishViewController.isIPad }
 	var fieldFakeSelectAllEnabled = false
 	weak var safarishViewController: SafarishViewController!
 
@@ -36,11 +39,12 @@ class SafarishURLEntryField: UIView {
 		self.fieldBackground.layer.cornerRadius = 4
 		self.fieldBackground.layer.masksToBounds = true
 		self.addSubview(self.fieldBackground)
+		self.backgroundRightConstraint = NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: 0)
 		self.addConstraints([
 			NSLayoutConstraint(item: self.fieldBackground, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.backgroundHeight),
 			NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 0),
-			NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: 0),
 			NSLayoutConstraint(item: self.fieldBackground, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
+			self.backgroundRightConstraint,
 		])
 		
 		self.field = UITextField(frame: .zero)
@@ -58,8 +62,8 @@ class SafarishURLEntryField: UIView {
 		self.field.addTarget(self, action: #selector(urlFieldChanged), for: .editingChanged)
 		self.addConstraints([
 			NSLayoutConstraint(item: self.field, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.backgroundHeight),
-			NSLayoutConstraint(item: self.field, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 5),
-			NSLayoutConstraint(item: self.field, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: -5),
+			NSLayoutConstraint(item: self.field, attribute: .left, relatedBy: .equal, toItem: self.fieldBackground, attribute: .left, multiplier: 1.0, constant: 5),
+			NSLayoutConstraint(item: self.field, attribute: .right, relatedBy: .equal, toItem: self.fieldBackground, attribute: .right, multiplier: 1.0, constant: -5),
 			NSLayoutConstraint(item: self.field, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 1),
 		])
 		
@@ -134,6 +138,29 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 		self.label.isHidden = false
 		self.labelCenterConstraint.isActive = !editable
 		self.labelLeftConstraint.isActive = editable
+		
+		if self.shouldShowCancelButton {
+			if self.cancelButton == nil {
+				self.cancelButton = UIButton(type: .system)
+				self.cancelButton.frame = CGRect(x: self.bounds.width, y: 0, width: 0, height: 0)
+				self.cancelButton.showsTouchWhenHighlighted = true
+				self.cancelButton.addTarget(self, action: #selector(cancelEditing), for: .touchUpInside)
+				self.cancelButton.translatesAutoresizingMaskIntoConstraints = false
+				self.cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Cancel"), for: .normal)
+				self.addSubview(self.cancelButton)
+				self.cancelButton.alpha = 0.0
+				self.addConstraints([
+					NSLayoutConstraint(item: self.cancelButton, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0),
+					NSLayoutConstraint(item: self.cancelButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: 5),
+				])
+			}
+
+			self.cancelButton.sizeToFit()
+			self.backgroundRightConstraint.constant = editable ? -(self.cancelButton.bounds.width + 6) : 0
+			print("Bounds: \(self.cancelButton.bounds)")
+		}
+		
+		
 		if let current = self.label.text, let new = self.field.text, let range = new.range(of: current) {
 			let attr: [NSAttributedStringKey: Any] = [ .font: self.label.font ]
 			let prefix = String(new[...range.lowerBound])
@@ -143,6 +170,7 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 		}
 
 		UIView.animate(withDuration: 0.25, animations: {
+			self.cancelButton?.alpha = editable ? 1.0 : 0.0
 			self.layoutIfNeeded()
 		}) { complete in
 			self.fieldFakeSelectAllEnabled = true
@@ -151,5 +179,10 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 			self.field.becomeFirstResponder()
 			self.field.attributedText = NSAttributedString(string: self.field.text ?? "", attributes: [.font: self.field.font!, .backgroundColor: self.selectionColor, .foregroundColor: self.field.textColor!])
 		}
+	}
+	
+	@objc func cancelEditing() {
+		self.field.text = self.url?.prettyURLString
+		self.makeFieldEditable(false)
 	}
 }

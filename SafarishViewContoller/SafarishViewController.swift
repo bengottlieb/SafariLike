@@ -236,7 +236,7 @@ open class SafarishViewController: UIViewController {
 
 	open override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
-		self.titleView?.urlField.endEditing(false)
+		self.titleView?.urlField.cancelEditing()
 		if self.navigationBarWasHidden == false {
 			self.navigationController?.setNavigationBarHidden(false, animated: animated)
 		}
