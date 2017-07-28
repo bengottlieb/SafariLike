@@ -9,19 +9,21 @@
 import UIKit
 import WebKit
 
+public typealias BarButtonItemsSet = (left: [UIBarButtonItem], right: [UIBarButtonItem])
+
 open class SafarishViewController: UIViewController {
 	static let blankURL = URL(string: "about:blank")!
 	deinit {
 		self.clearOut()
 	}
 	
-	override open var toolbarItems: [UIBarButtonItem]? { didSet {
-		if let items = self.toolbarItems {
-			let midpoint = items.count / 2
-			self.iPadNavigationBarItems = (left: Array(items[0..<midpoint]), right: Array(items[midpoint..<items.count]))
-		}
-	}}
-	open var iPadNavigationBarItems: (left: [UIBarButtonItem], right: [UIBarButtonItem])? { didSet {
+//	override open var toolbarItems: [UIBarButtonItem]? { didSet {
+//		if let items = self.toolbarItems {
+//			let midpoint = items.count / 2
+//			self.barButtonItems = (left: Array(items[..<midpoint]), right: Array(items[midpoint...]))
+//		}
+//	}}
+	open var barButtonItems: BarButtonItemsSet! { didSet {
 		self.loadNavigationBarButtonItems()
 	}}
 
@@ -73,9 +75,15 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	func loadNavigationBarButtonItems() {
-		if let items = self.iPadNavigationBarItems, self.isIPad {
-			self.titleView.leftBarButtonItems = items.left
-			self.titleView.rightBarButtonItems = items.right
+		if self.isIPad {
+			self.titleView.leftBarButtonItems = self.barButtonItems.left
+			self.titleView.rightBarButtonItems = self.barButtonItems.right
+		} else {
+			self.hidesBottomBarWhenPushed = false
+			self.toolbarItems = (self.barButtonItems.left + self.barButtonItems.right).flatMap({
+				return [$0, UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)]
+			})
+			self.toolbarItems?.removeLast()
 		}
 	}
 	
@@ -102,7 +110,7 @@ open class SafarishViewController: UIViewController {
 			self.pageForwardButtonItem.width = 30
 
 		//	self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
-			self.iPadNavigationBarItems = ( left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ], right: [] )
+			self.barButtonItems = ( left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ], right: [] )
 		}
 		
 		self.navigationItem.leftBarButtonItems = []
@@ -209,6 +217,7 @@ open class SafarishViewController: UIViewController {
 		super.viewDidAppear(animated)
         self.setupViews()
 		self.loadInitialContent()
+		if !self.isIPad { self.navigationController?.setToolbarHidden(false, animated: true) }
 		//self.setupNavigationItem()
 	}
 	
