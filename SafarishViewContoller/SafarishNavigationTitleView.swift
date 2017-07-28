@@ -9,6 +9,8 @@
 import UIKit
 
 class SafarishNavigationTitleView: UIView {
+	var estimatedProgress: CGFloat?
+	
 	var urlField: SafarishURLEntryField!
 	var parent: SafarishViewController!
 	var leftToolbar: UIToolbar!
@@ -33,8 +35,9 @@ class SafarishNavigationTitleView: UIView {
 		self.translatesAutoresizingMaskIntoConstraints = false
 
 		self.parent = parent
-		self.urlField = SafarishURLEntryField(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
-		
+		self.urlField = SafarishURLEntryField(in: parent)
+		self.backgroundColor = .clear
+
 		self.leftToolbar = UIToolbar(frame: .zero)
 		self.rightToolbar = UIToolbar(frame: .zero)
 		
@@ -78,6 +81,24 @@ class SafarishNavigationTitleView: UIView {
 		self.updateToolbarWidths()
 	}
 	
+	override func draw(_ rect: CGRect) {
+		let lineWidth = 1.0 / UIScreen.main.scale
+		let bezier = UIBezierPath()
+		let bounds = self.bounds
+		UIColor.lightGray.setStroke()
+		bezier.move(to: CGPoint(x: 0, y: bounds.height - lineWidth))
+		bezier.addLine(to: CGPoint(x: bounds.width, y: bounds.height - lineWidth))
+		bezier.lineWidth = lineWidth
+		bezier.stroke()
+		
+		if let progress = self.estimatedProgress, progress < 1.0 {
+			let progressHeight: CGFloat = 3.0
+			let barRect = CGRect(x: 0, y: bounds.height - progressHeight, width: bounds.width * CGFloat(progress), height: progressHeight)
+			self.tintColor.setFill()
+			UIRectFill(barRect)
+		}
+	}
+
 	func updateToolbarWidths() {
 		let leftWidth = self.leftToolbar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0
 		let rightWidth = self.rightToolbar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0

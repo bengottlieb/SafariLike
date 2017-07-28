@@ -19,20 +19,17 @@ class SafarishURLEntryField: UIView {
 	var fieldBackground: UIView!
 	var backgroundHeight: CGFloat = 30
 	var url: URL? { didSet {
-			self.setup()
 			self.field.text = url?.prettyURLString
 			self.label.text = url?.prettyName
 		}}
 	
-	override func didMoveToSuperview() {
-		super.didMoveToSuperview()
-		self.setup()
-	}
-	
 	let selectionColor = UIColor(red: 0.0, green: 0.33, blue: 0.65, alpha: 0.2)
 	
-	func setup() {
-		if self.field != nil { return }
+	convenience init(in parent: SafarishViewController) {
+		self.init(frame: .zero)
+		self.backgroundColor = .clear
+		
+		self.safarishViewController = parent
 		self.fieldBackground = UIView(frame: .zero)
 		self.fieldBackground.backgroundColor = UIColor(white: 0.85, alpha: 1.0)
 		self.fieldBackground.translatesAutoresizingMaskIntoConstraints = false
@@ -117,7 +114,7 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 	}
 	
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-		if let url = URL(string: "https://" + (self.field.text ?? "")) {
+		if let text = self.field.text, !text.isEmpty, let url = URL(string: "https://" + text) {
 			self.url = url
 			self.safarishViewController?.didEnterURL(url)
 		} else {

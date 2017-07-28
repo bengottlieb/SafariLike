@@ -36,13 +36,13 @@ open class SafarishViewController: UIViewController {
 	
 	public var forceHTTP = false
 	
-	var titleBar: TitleBarView!
 	var webView: WKWebView!
 	var url: URL? { didSet { self.titleView?.urlField.url = self.url }}
 	var currentURL: URL? { return self.webView?.url ?? self.url }
 	var data: Data?
 	var html: String?
 	var titleView: SafarishNavigationTitleView!
+	var isIPad: Bool { return UIDevice.current.userInterfaceIdiom == .pad }
 	
 	public convenience init(url: URL?) {
 		self.init()
@@ -73,7 +73,7 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	func loadNavigationBarButtonItems() {
-		if let items = self.iPadNavigationBarItems {
+		if let items = self.iPadNavigationBarItems, self.isIPad {
 			self.titleView.leftBarButtonItems = items.left
 			self.titleView.rightBarButtonItems = items.right
 		}
@@ -178,7 +178,7 @@ open class SafarishViewController: UIViewController {
 			self.webView = self.createWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
 			self.view.addSubview(self.webView)
 			self.webView.translatesAutoresizingMaskIntoConstraints = false
-            self.webView.scrollView.delegate = self.titleBar
+            self.webView.scrollView.delegate = self
             self.webView.navigationDelegate = self
 			
 			self.webView.addObserver(self, forKeyPath: "canGoBack", options: [], context: nil)
@@ -190,13 +190,13 @@ open class SafarishViewController: UIViewController {
 				NSLayoutConstraint(item: self.webView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
 				NSLayoutConstraint(item: self.webView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0),
 			])
-			self.webView.scrollView.contentInset = UIEdgeInsets(top: TitleBarView.maxHeight, left: 0, bottom: 0, right: 0)
+//			self.webView.scrollView.contentInset = UIEdgeInsets(top: TitleBarView.maxHeight, left: 0, bottom: 0, right: 0)
 		}
 	}
 	
 	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
 		if keyPath == "estimatedProgress", self.webView?.url != SafarishViewController.blankURL {
-			self.titleBar?.estimatedProgress = self.webView?.estimatedProgress ?? 0
+			self.titleView?.estimatedProgress = CGFloat(self.webView?.estimatedProgress ?? 0)
 			if self.webView.estimatedProgress == 1.0 { self.loadDidFinish(for: self.webView.url) }
 		} else if keyPath == "canGoBack" {
 			self.pageBackButtonItem.isEnabled = self.canGoBack
@@ -214,21 +214,20 @@ open class SafarishViewController: UIViewController {
 	
 	func loadInitialContent() {
 		if let data = self.data {
-			self.titleBar?.updateURLField()
+			self.updateURLField()
 			_ = self.webView?.load(data, mimeType: "application/x-webarchive", characterEncodingName: "", baseURL: self.url ?? SafarishViewController.blankURL)
 		} else if let url = self.url, url != SafarishViewController.blankURL {
 			self.webView.load(URLRequest(url: url))
-			self.titleBar?.updateURLField()
+			self.updateURLField()
 		} else if let html = self.html {
 			self.webView.loadHTMLString(html, baseURL: self.url)
 		} else {
-			self.titleBar?.beginEditingURL()
 		}
 	}
 
 	open override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
-		self.titleBar?.makeFieldEditable(false)
+		self.titleView?.urlField.endEditing(false)
 		if self.navigationBarWasHidden == false {
 			self.navigationController?.setNavigationBarHidden(false, animated: animated)
 		}
@@ -286,6 +285,10 @@ extension SafarishViewController {
     @objc func pageForward() {
         self.webView.goForward()
     }
+	
+	func updateURLField() {
+		self.titleView?.urlField.url = self.url
+	}
 }
 
 extension SafarishViewController: WKNavigationDelegate {
@@ -298,16 +301,16 @@ extension SafarishViewController: WKNavigationDelegate {
 	}
 	
 	public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-		self.titleBar?.updateURLField()
+		self.updateURLField()
 	}
 	
 	public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-		self.titleBar?.updateURLField()
+		self.updateURLField()
 		self.shouldObserveEstimatedProgress = true
 	}
 	
 	public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-		self.titleBar?.makeFullyVisible(animated: true)
+		//self.titleBar?.makeFullyVisible(animated: true)
 	}
 	
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -339,3 +342,6 @@ extension SafarishViewController: WKNavigationDelegate {
 	}
 }
 
+extension SafarishViewController: UIScrollViewDelegate {
+	
+}

@@ -351,21 +351,3 @@ extension SafarishViewController.TitleBarView {
 }
 
 
-extension URL {
-	var prettyName: String? {
-		let components = URLComponents(url: self, resolvingAgainstBaseURL: false)
-		var name = components?.host ?? ""
-		if name.hasPrefix("www.") { name = name.substring(from: name.index(name.startIndex, offsetBy: 4)) }
-		return name
-	}
-	
-	var prettyURLString: String? {
-		var string = ""
-		if self.absoluteString == "about:blank" { return "" }
-
-		if let host = self.host, !host.isEmpty { string += host }
-		if self.path.isEmpty { string += "/" + self.path}
-		
-		return string
-	}
-}

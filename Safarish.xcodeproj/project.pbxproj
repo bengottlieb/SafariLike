@@ -14,10 +14,9 @@
 		B5C7F36E1E132C7700D1E245 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5C7F36C1E132C7700D1E245 /* LaunchScreen.storyboard */; };
 		B5C7F36F1E132C7700D1E245 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5C7F36D1E132C7700D1E245 /* Main.storyboard */; };
 		B5C7F3771E14127200D1E245 /* Safarish.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5C7F3731E14127200D1E245 /* Safarish.xcassets */; };
-		B5C7F3781E14127200D1E245 /* SafarishIPadTitleBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7F3741E14127200D1E245 /* SafarishIPadTitleBarView.swift */; };
-		B5C7F3791E14127200D1E245 /* SafarishIPhoneTitleBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7F3751E14127200D1E245 /* SafarishIPhoneTitleBarView.swift */; };
 		B5C7F37A1E14127200D1E245 /* SafarishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7F3761E14127200D1E245 /* SafarishViewController.swift */; };
 		B5DD3ADE1F2AA9D8000519FB /* SafarishURLEntryField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */; };
+		B5E36BCC1F2BB252004D357A /* URL+Safarish.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,10 +41,9 @@
 		B5C7F36C1E132C7700D1E245 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Safarish/LaunchScreen.storyboard; sourceTree = SOURCE_ROOT; };
 		B5C7F36D1E132C7700D1E245 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Safarish/Main.storyboard; sourceTree = SOURCE_ROOT; };
 		B5C7F3731E14127200D1E245 /* Safarish.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Safarish.xcassets; sourceTree = "<group>"; };
-		B5C7F3741E14127200D1E245 /* SafarishIPadTitleBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafarishIPadTitleBarView.swift; sourceTree = "<group>"; };
-		B5C7F3751E14127200D1E245 /* SafarishIPhoneTitleBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafarishIPhoneTitleBarView.swift; sourceTree = "<group>"; };
 		B5C7F3761E14127200D1E245 /* SafarishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafarishViewController.swift; sourceTree = "<group>"; };
 		B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishURLEntryField.swift; sourceTree = "<group>"; };
+		B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Safarish.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,10 +100,9 @@
 			children = (
 				B5C7F3731E14127200D1E245 /* Safarish.xcassets */,
 				B5C7F3761E14127200D1E245 /* SafarishViewController.swift */,
-				B5C7F3741E14127200D1E245 /* SafarishIPadTitleBarView.swift */,
-				B5C7F3751E14127200D1E245 /* SafarishIPhoneTitleBarView.swift */,
-				B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */,
 				B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */,
+				B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */,
+				B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */,
 			);
 			path = SafarishViewContoller;
 			sourceTree = "<group>";
@@ -186,11 +183,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				B5DD3ADE1F2AA9D8000519FB /* SafarishURLEntryField.swift in Sources */,
-				B5C7F3781E14127200D1E245 /* SafarishIPadTitleBarView.swift in Sources */,
 				B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */,
 				B5C7F37A1E14127200D1E245 /* SafarishViewController.swift in Sources */,
 				B5815CF81F2B4A5F007541AE /* SafarishNavigationTitleView.swift in Sources */,
-				B5C7F3791E14127200D1E245 /* SafarishIPhoneTitleBarView.swift in Sources */,
+				B5E36BCC1F2BB252004D357A /* URL+Safarish.swift in Sources */,
 				B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
