@@ -101,7 +101,7 @@ open class SafarishViewController: UIViewController {
 			self.pageForwardButtonItem.isEnabled = false
 			self.pageForwardButtonItem.width = 30
 
-			self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
+		//	self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
 			self.iPadNavigationBarItems = ( left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ], right: [] )
 		}
 		
@@ -174,7 +174,7 @@ open class SafarishViewController: UIViewController {
 	}
     
     func setupViews() {
-		if self.titleBar == nil {
+		if self.webView == nil {
 			self.webView = self.createWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
 			self.view.addSubview(self.webView)
 			self.webView.translatesAutoresizingMaskIntoConstraints = false
@@ -191,24 +191,12 @@ open class SafarishViewController: UIViewController {
 				NSLayoutConstraint(item: self.webView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0),
 			])
 			self.webView.scrollView.contentInset = UIEdgeInsets(top: TitleBarView.maxHeight, left: 0, bottom: 0, right: 0)
-			
-			if UIDevice.current.userInterfaceIdiom == .pad {
-				self.titleBar = IPadTitleBarView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: TitleBarView.maxHeight), parent: self)
-			} else {
-				self.titleBar = TitleBarView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: TitleBarView.maxHeight), parent: self)
-			}
-			self.view.addSubview(self.titleBar)
-			self.view.addConstraints([
-				NSLayoutConstraint(item: self.titleBar, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0),
-				NSLayoutConstraint(item: self.titleBar, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
-				NSLayoutConstraint(item: self.titleBar, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
-			])
-        }
+		}
 	}
 	
 	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
 		if keyPath == "estimatedProgress", self.webView?.url != SafarishViewController.blankURL {
-			self.titleBar.estimatedProgress = self.webView?.estimatedProgress ?? 0
+			self.titleBar?.estimatedProgress = self.webView?.estimatedProgress ?? 0
 			if self.webView.estimatedProgress == 1.0 { self.loadDidFinish(for: self.webView.url) }
 		} else if keyPath == "canGoBack" {
 			self.pageBackButtonItem.isEnabled = self.canGoBack
@@ -240,7 +228,7 @@ open class SafarishViewController: UIViewController {
 
 	open override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
-		self.titleBar.makeFieldEditable(false)
+		self.titleBar?.makeFieldEditable(false)
 		if self.navigationBarWasHidden == false {
 			self.navigationController?.setNavigationBarHidden(false, animated: animated)
 		}
@@ -319,7 +307,7 @@ extension SafarishViewController: WKNavigationDelegate {
 	}
 	
 	public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-		self.titleBar.makeFullyVisible(animated: true)
+		self.titleBar?.makeFullyVisible(animated: true)
 	}
 	
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

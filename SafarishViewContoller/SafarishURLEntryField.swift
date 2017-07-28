@@ -41,8 +41,8 @@ class SafarishURLEntryField: UIView {
 		self.addSubview(self.fieldBackground)
 		self.addConstraints([
 			NSLayoutConstraint(item: self.fieldBackground, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.backgroundHeight),
-			NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 5),
-			NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: -5),
+			NSLayoutConstraint(item: self.fieldBackground, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 0),
+			NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: 0),
 			NSLayoutConstraint(item: self.fieldBackground, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
 		])
 		
@@ -61,8 +61,8 @@ class SafarishURLEntryField: UIView {
 		self.field.addTarget(self, action: #selector(urlFieldChanged), for: .editingChanged)
 		self.addConstraints([
 			NSLayoutConstraint(item: self.field, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.backgroundHeight),
-			NSLayoutConstraint(item: self.field, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 10),
-			NSLayoutConstraint(item: self.field, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: -10),
+			NSLayoutConstraint(item: self.field, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 5),
+			NSLayoutConstraint(item: self.field, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: -5),
 			NSLayoutConstraint(item: self.field, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 1),
 		])
 		

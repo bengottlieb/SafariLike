@@ -52,13 +52,12 @@ class SafarishNavigationTitleView: UIView {
 		])
 		
 		self.mainWidthConstraint = NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.bounds.width)
-		self.leftToolbarWidthConstraint = NSLayoutConstraint(item: self.leftToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 10)
-		self.rightToolbarWidthConstraint = NSLayoutConstraint(item: self.rightToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 10)
+		self.leftToolbarWidthConstraint = NSLayoutConstraint(item: self.leftToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 0)
+		self.rightToolbarWidthConstraint = NSLayoutConstraint(item: self.rightToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 0)
 
 		self.addConstraints([
 			self.mainWidthConstraint,
 			NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.bounds.height),
-			//NSLayoutConstraint(item: self.urlField, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1.0, constant: 0),
 			NSLayoutConstraint(item: self.urlField, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
 			
 			NSLayoutConstraint(item: self.leftToolbar, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 0),
@@ -80,7 +79,9 @@ class SafarishNavigationTitleView: UIView {
 	}
 	
 	func updateToolbarWidths() {
-		let maxWidth = max(self.leftToolbar.items?.reduce(0) { $0 + $1.width } ?? 0, self.rightToolbar.items?.reduce(0) { $0 + $1.width } ?? 0)
+		let leftWidth = self.leftToolbar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0
+		let rightWidth = self.rightToolbar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0
+		let maxWidth = max(leftWidth, rightWidth)
 		self.leftToolbarWidthConstraint.constant = maxWidth
 		self.rightToolbarWidthConstraint.constant = maxWidth
 		self.setNeedsLayout()
@@ -91,3 +92,4 @@ class SafarishNavigationTitleView: UIView {
 	var rightToolbarWidthConstraint: NSLayoutConstraint!
 	
 }
+
