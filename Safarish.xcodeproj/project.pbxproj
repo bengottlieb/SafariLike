@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B5815CF81F2B4A5F007541AE /* SafarishNavigationTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */; };
 		B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */; };
 		B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34D1E06E05800C46CD8 /* ViewController.swift */; };
 		B58FE3531E06E05800C46CD8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B58FE3521E06E05800C46CD8 /* Assets.xcassets */; };
@@ -32,6 +33,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishNavigationTitleView.swift; sourceTree = "<group>"; };
 		B58FE3481E06E05800C46CD8 /* Safarish.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Safarish.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B58FE34D1E06E05800C46CD8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				B5C7F3741E14127200D1E245 /* SafarishIPadTitleBarView.swift */,
 				B5C7F3751E14127200D1E245 /* SafarishIPhoneTitleBarView.swift */,
 				B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */,
+				B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */,
 			);
 			path = SafarishViewContoller;
 			sourceTree = "<group>";
@@ -186,6 +189,7 @@
 				B5C7F3781E14127200D1E245 /* SafarishIPadTitleBarView.swift in Sources */,
 				B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */,
 				B5C7F37A1E14127200D1E245 /* SafarishViewController.swift in Sources */,
+				B5815CF81F2B4A5F007541AE /* SafarishNavigationTitleView.swift in Sources */,
 				B5C7F3791E14127200D1E245 /* SafarishIPhoneTitleBarView.swift in Sources */,
 				B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */,
 			);

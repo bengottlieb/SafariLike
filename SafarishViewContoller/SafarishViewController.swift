@@ -38,11 +38,11 @@ open class SafarishViewController: UIViewController {
 	
 	var titleBar: TitleBarView!
 	var webView: WKWebView!
-	var url: URL? { didSet { self.titleView?.url = self.url }}
+	var url: URL? { didSet { self.titleView?.urlField.url = self.url }}
 	var currentURL: URL? { return self.webView?.url ?? self.url }
 	var data: Data?
 	var html: String?
-	var titleView: SafarishURLEntryField!
+	var titleView: SafarishNavigationTitleView!
 	
 	public convenience init(url: URL?) {
 		self.init()
@@ -55,49 +55,60 @@ open class SafarishViewController: UIViewController {
 		} else {
 			self.url = SafarishViewController.blankURL
 		}
+		self.setup()
 	}
 	
 	public convenience init(data: Data, from url: URL?) {
 		self.init()
 		self.data = data
 		self.url = url
+		self.setup()
 	}
 	
 	public convenience init(html: String, from url: URL?) {
 		self.init()
 		self.html = html
 		self.url = url
+		self.setup()
 	}
 	
 	func loadNavigationBarButtonItems() {
 		if let items = self.iPadNavigationBarItems {
-			self.navigationItem.leftBarButtonItems = items.left
-			self.navigationItem.rightBarButtonItems = items.right
+			self.titleView.leftBarButtonItems = items.left
+			self.titleView.rightBarButtonItems = items.right
 		}
+	}
+	
+	func setup() {
+		self.setupNavigationItem()
 	}
 	
 	func setupNavigationItem() {
 		if self.titleView == nil {
-			let frame = CGRect(x: 0, y: 0, width: 1000, height: 44)
-			self.titleView = SafarishURLEntryField(frame: frame)
+			self.titleView = SafarishNavigationTitleView(in: self)
 			self.navigationItem.titleView = self.titleView
-			self.titleView.url = self.url
-			self.titleView.safarishViewController = self
+			self.titleView.urlField.url = self.url
 		}
 
 		if self.doneButtonItem == nil {
 			self.doneButtonItem = UIBarButtonItem(title: self.doneButtonTitle, style: .plain, target: self, action: #selector(done))
-			self.doneButtonItem.width = self.doneButtonItem.width
+			self.doneButtonItem.width = 50
 			
 			self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
 			self.pageBackButtonItem.isEnabled = false
+			self.pageBackButtonItem.width = 30
 			self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
 			self.pageForwardButtonItem.isEnabled = false
+			self.pageForwardButtonItem.width = 30
 
 			self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
-			self.iPadNavigationBarItems = (left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem], right: [])
+			self.iPadNavigationBarItems = ( left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ], right: [] )
 		}
 		
+		self.navigationItem.leftBarButtonItems = []
+		self.navigationItem.rightBarButtonItems = []
+		self.navigationItem.hidesBackButton = true
+
 		self.loadNavigationBarButtonItems()
 	}
 	
@@ -155,6 +166,7 @@ open class SafarishViewController: UIViewController {
 	
 	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
+		self.titleView.viewWidth = self.view.bounds.width
     }
 	
 	open func createWebView(frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
@@ -209,7 +221,7 @@ open class SafarishViewController: UIViewController {
 		super.viewDidAppear(animated)
         self.setupViews()
 		self.loadInitialContent()
-		self.setupNavigationItem()
+		//self.setupNavigationItem()
 	}
 	
 	func loadInitialContent() {
