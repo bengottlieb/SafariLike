@@ -14,6 +14,7 @@ class SafarishURLEntryField: UIView {
 	var labelCenterConstraint: NSLayoutConstraint!
 	var labelLeftConstraint: NSLayoutConstraint!
 	var fieldFakeSelectAllEnabled = false
+	weak var safarishViewController: SafarishViewController!
 
 	var fieldBackground: UIView!
 	var backgroundHeight: CGFloat = 30
@@ -96,8 +97,18 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 		self.makeFieldEditable(true)
 	}
 	
+	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+		if self.self.fieldFakeSelectAllEnabled {
+			self.field.text = string
+			self.fieldFakeSelectAllEnabled = false
+			return false
+		}
+		return true
+	}
+	
 	@objc func clearSelectAll() {
 		if self.fieldFakeSelectAllEnabled {
+			self.fieldFakeSelectAllEnabled = false
 			self.urlFieldChanged()
 			if let position = self.field.position(from: self.field.endOfDocument, offset: -1) {
 				self.field.selectedTextRange = self.field.textRange(from: position, to: position)
@@ -108,6 +119,7 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
 		if let url = URL(string: "https://" + (self.field.text ?? "")) {
 			self.url = url
+			self.safarishViewController?.didEnterURL(url)
 		} else {
 			self.label.text = url?.prettyName
 		}

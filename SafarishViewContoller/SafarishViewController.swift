@@ -82,6 +82,7 @@ open class SafarishViewController: UIViewController {
 			self.titleView = SafarishURLEntryField(frame: frame)
 			self.navigationItem.titleView = self.titleView
 			self.titleView.url = self.url
+			self.titleView.safarishViewController = self
 		}
 
 		if self.doneButtonItem == nil {
