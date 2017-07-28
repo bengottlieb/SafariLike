@@ -145,7 +145,7 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	var canGoBack: Bool {
-		if let url = self.url, url != self.webView.url { return true }
+		if let url = self.url?.normalized, url != self.webView.url?.normalized { return true }
 		return self.webView.canGoBack
 	}
 	

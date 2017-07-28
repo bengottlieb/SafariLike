@@ -26,4 +26,11 @@ extension URL {
 		
 		return string
 	}
+	
+	var normalized: URL {
+		guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { return self }
+		if components.scheme == "http" { components.scheme = "https" }
+		if components.path == "/" { components.path = "" }
+		return components.url ??  self
+	}
 }
