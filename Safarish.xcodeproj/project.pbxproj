@@ -99,9 +99,9 @@
 			isa = PBXGroup;
 			children = (
 				B5C7F3731E14127200D1E245 /* Safarish.xcassets */,
+				B5C7F3761E14127200D1E245 /* SafarishViewController.swift */,
 				B5C7F3741E14127200D1E245 /* SafarishIPadTitleBarView.swift */,
 				B5C7F3751E14127200D1E245 /* SafarishIPhoneTitleBarView.swift */,
-				B5C7F3761E14127200D1E245 /* SafarishViewController.swift */,
 				B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */,
 			);
 			path = SafarishViewContoller;

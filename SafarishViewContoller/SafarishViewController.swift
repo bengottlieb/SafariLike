@@ -18,10 +18,12 @@ open class SafarishViewController: UIViewController {
 	override open var toolbarItems: [UIBarButtonItem]? { didSet {
 		if let items = self.toolbarItems {
 			let midpoint = items.count / 2
-			self.ipadToolbarItems = (left: Array(items[0..<midpoint]), right: Array(items[midpoint..<items.count]))
+			self.iPadNavigationBarItems = (left: Array(items[0..<midpoint]), right: Array(items[midpoint..<items.count]))
 		}
 	}}
-	open var ipadToolbarItems: (left: [UIBarButtonItem], right: [UIBarButtonItem])?
+	open var iPadNavigationBarItems: (left: [UIBarButtonItem], right: [UIBarButtonItem])? { didSet {
+		self.loadNavigationBarButtonItems()
+	}}
 
 	public var forceCenteredURLBar = false
 	public var doneButtonTitle = NSLocalizedString("Done", comment: "Done")
@@ -67,7 +69,21 @@ open class SafarishViewController: UIViewController {
 		self.url = url
 	}
 	
-	func setupToolbar() {
+	func loadNavigationBarButtonItems() {
+		if let items = self.iPadNavigationBarItems {
+			self.navigationItem.leftBarButtonItems = items.left
+			self.navigationItem.rightBarButtonItems = items.right
+		}
+	}
+	
+	func setupNavigationItem() {
+		if self.titleView == nil {
+			let frame = CGRect(x: 0, y: 0, width: 1000, height: 44)
+			self.titleView = SafarishURLEntryField(frame: frame)
+			self.navigationItem.titleView = self.titleView
+			self.titleView.url = self.url
+		}
+
 		if self.doneButtonItem == nil {
 			self.doneButtonItem = UIBarButtonItem(title: self.doneButtonTitle, style: .plain, target: self, action: #selector(done))
 			self.doneButtonItem.width = self.doneButtonItem.width
@@ -78,8 +94,10 @@ open class SafarishViewController: UIViewController {
 			self.pageForwardButtonItem.isEnabled = false
 
 			self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
-			self.ipadToolbarItems = (left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem], right: [])
+			self.iPadNavigationBarItems = (left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem], right: [])
 		}
+		
+		self.loadNavigationBarButtonItems()
 	}
 	
 	
@@ -112,7 +130,6 @@ open class SafarishViewController: UIViewController {
 	open override func viewWillAppear(_ animated: Bool) {
         self.updateNavigationBar()
 		super.viewWillAppear(animated)
-        self.setupViews()
 	}
 	
 	var canGoBack: Bool {
@@ -137,7 +154,6 @@ open class SafarishViewController: UIViewController {
 	
 	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		self.setupViews()
     }
 	
 	open func createWebView(frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
@@ -145,13 +161,7 @@ open class SafarishViewController: UIViewController {
 	}
     
     func setupViews() {
-		self.titleView = SafarishURLEntryField(frame: CGRect(x: 0, y: 0, width: 1000, height: 44))
-		self.navigationItem.titleView = self.titleView
-		
-		self.titleView.url = self.url
-		
 		if self.titleBar == nil {
-            //self.setupToolbar()
 			self.webView = self.createWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
 			self.view.addSubview(self.webView)
 			self.webView.translatesAutoresizingMaskIntoConstraints = false
@@ -198,6 +208,7 @@ open class SafarishViewController: UIViewController {
 		super.viewDidAppear(animated)
         self.setupViews()
 		self.loadInitialContent()
+		self.setupNavigationItem()
 	}
 	
 	func loadInitialContent() {
