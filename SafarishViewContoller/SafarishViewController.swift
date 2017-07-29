@@ -217,6 +217,7 @@ open class SafarishViewController: UIViewController {
 		super.viewDidAppear(animated)
         self.setupViews()
 		self.loadInitialContent()
+		self.navigationController?.setNavigationBarHidden(false, animated: true)
 		if !self.isIPad { self.navigationController?.setToolbarHidden(false, animated: true) }
 		//self.setupNavigationItem()
 	}
@@ -237,9 +238,6 @@ open class SafarishViewController: UIViewController {
 	open override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		self.titleView?.urlField.cancelEditing()
-		if self.navigationBarWasHidden == false {
-			self.navigationController?.setNavigationBarHidden(false, animated: animated)
-		}
 	}
 	
 	func didEnterURL(_ url: URL?) {

@@ -49,6 +49,10 @@ class SafarishNavigationTitleView: UIView {
 		self.rightToolbar.translatesAutoresizingMaskIntoConstraints = false
 		self.urlField.safarishViewController = parent
 		
+		let nullImage = UIImage()
+		self.leftToolbar.setShadowImage(nullImage, forToolbarPosition: .any)
+		self.rightToolbar.setShadowImage(nullImage, forToolbarPosition: .any)
+
 		self.urlField.addConstraints([
 			//NSLayoutConstraint(item: self.urlField, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 400),
 			NSLayoutConstraint(item: self.urlField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 44)
