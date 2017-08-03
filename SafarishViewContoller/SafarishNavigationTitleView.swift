@@ -15,6 +15,7 @@ class SafarishNavigationTitleView: UIView {
 	var parent: SafarishViewController!
 	var leftToolbar: UIToolbar!
 	var rightToolbar: UIToolbar!
+	var navigationBarScrollPercentage: CGFloat = 0.0 { didSet { self.updateShrinkage() }}
 	
 	var viewWidth: CGFloat = 740 { didSet {
 		self.mainWidthConstraint.constant = self.viewWidth - 28
@@ -103,6 +104,17 @@ class SafarishNavigationTitleView: UIView {
 			self.tintColor.setFill()
 			UIRectFill(barRect)
 		}
+	}
+	
+	func updateShrinkage() {
+		self.urlField.navigationBarScrollPercentage = self.navigationBarScrollPercentage
+		self.leftToolbar.alpha = 1.0 - self.navigationBarScrollPercentage
+		self.rightToolbar.alpha = 1.0 - self.navigationBarScrollPercentage
+		
+		self.leftToolbar.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
+		self.rightToolbar.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
+
+		print("now scrolled to \(self.navigationBarScrollPercentage)")
 	}
 
 	func updateToolbarWidths() {

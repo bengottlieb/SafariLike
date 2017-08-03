@@ -18,6 +18,7 @@ class SafarishURLEntryField: UIView {
 	var shouldShowCancelButton: Bool { return !self.safarishViewController.isIPad }
 	var fieldFakeSelectAllEnabled = false
 	weak var safarishViewController: SafarishViewController!
+	var navigationBarScrollPercentage: CGFloat = 0.0 { didSet { self.updateShrinkage() }}
 
 	var fieldBackground: UIView!
 	var backgroundHeight: CGFloat = 30
@@ -88,6 +89,12 @@ class SafarishURLEntryField: UIView {
 		self.addGestureRecognizer(recog)
 
 		self.field.addTarget(self, action: #selector(clearSelectAll), for: .touchDown)
+	}
+	
+	func updateShrinkage() {
+		self.fieldBackground.alpha = 1.0 - self.navigationBarScrollPercentage
+		self.label.transform = CGAffineTransform(translationX: 0, y: 10 * self.navigationBarScrollPercentage)
+		self.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
 	}
 }
 
@@ -191,7 +198,7 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 
 extension URL {
 	init?(fragment: String?) {
-		guard let frag = fragment, !fragment.isEmpty else { self.init(string: ""); return nil }
+		guard let frag = fragment, !frag.isEmpty else { self.init(string: ""); return nil }
 		
 		if let components = URLComponents(string: frag), components.scheme != nil {
 			self.init(string: frag)

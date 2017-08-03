@@ -23,7 +23,7 @@ class ViewController: UIViewController {
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		
-		let url = URL(string: "https://www.standalone.com")!
+		let url = URL(string: "https://github.com/matteocrippa/awesome-swift")!
 		let wv = SafarishViewController(url: url)
 		wv.barButtonItems = (left: wv.barButtonItems.left, right: [
 			UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil),

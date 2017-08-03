@@ -37,6 +37,8 @@ open class SafarishViewController: UIViewController {
 	open var searchStringTemplate = "https://www.google.com/#q=%@"
 	public var widthDeterminingViewController: UIViewController?
 
+	public var maximumNavigationScrollTranslation: CGFloat = 24
+	public var scrollableNavigationBar: UINavigationBar?
 	public var forceHTTP = false
 	
 	var webView: WKWebView!
@@ -229,7 +231,8 @@ open class SafarishViewController: UIViewController {
 		super.viewDidAppear(animated)
 		self.loadInitialContent()
 		self.navigationController?.setNavigationBarHidden(false, animated: true)
-		self.navigationController?.setToolbarHidden(self.isIPad, animated: true) 
+		self.navigationController?.setToolbarHidden(self.isIPad, animated: true)
+		self.scrollableNavigationBar = self.navigationController?.navigationBar
 		//self.setupNavigationItem()
 	}
 	
@@ -361,5 +364,14 @@ extension SafarishViewController: WKNavigationDelegate {
 }
 
 extension SafarishViewController: UIScrollViewDelegate {
-	
+	public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+		guard let bar = self.scrollableNavigationBar else { return }
+		var yOffset = -(scrollView.contentOffset.y + 64)
+		if yOffset < -self.maximumNavigationScrollTranslation { yOffset = -self.maximumNavigationScrollTranslation }
+		if yOffset > 0 { yOffset = 0 }
+		
+		if bar.transform.ty == yOffset { return }
+		self.titleView?.navigationBarScrollPercentage = abs(yOffset / self.maximumNavigationScrollTranslation)
+		bar.transform = CGAffineTransform(translationX: 0, y: yOffset)
+	}
 }
