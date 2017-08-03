@@ -35,7 +35,8 @@ open class SafarishViewController: UIViewController {
 	open var pageBackImage = UIImage(named: "safarish-page-back", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
 	open var pageForwardImage = UIImage(named: "safarish-page-forward", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
 	open var searchStringTemplate = "https://www.google.com/#q=%@"
-	
+	public var widthDeterminingViewController: UIViewController?
+
 	public var forceHTTP = false
 	
 	var webView: WKWebView!
@@ -134,6 +135,12 @@ open class SafarishViewController: UIViewController {
 		}
 	}
 	
+	open func load(request: URLRequest) {
+		self.url = request.url
+		self.titleView.urlField.url = self.url
+		self.webView.load(request)
+	}
+	
 	func clearOut() {
 		self.webView?.removeObserver(self, forKeyPath: "canGoBack")
 		self.webView?.removeObserver(self, forKeyPath: "canGoForward")
@@ -172,9 +179,14 @@ open class SafarishViewController: UIViewController {
 //        }
     }
 	
+	override open func viewDidLoad() {
+		super.viewDidLoad()
+		self.setupViews()
+	}
+	
 	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		self.titleView.viewWidth = self.view.bounds.width
+		self.titleView.viewWidth = (self.widthDeterminingViewController ?? self).view.bounds.width
     }
 	
 	open func createWebView(frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
@@ -191,15 +203,15 @@ open class SafarishViewController: UIViewController {
 			
 			self.webView.addObserver(self, forKeyPath: "canGoBack", options: [], context: nil)
 			self.webView.addObserver(self, forKeyPath: "canGoForward", options: [], context: nil)
-			
-            self.view.addConstraints([
-				NSLayoutConstraint(item: self.webView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0),
-				NSLayoutConstraint(item: self.webView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
-				NSLayoutConstraint(item: self.webView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
-				NSLayoutConstraint(item: self.webView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0),
-			])
-//			self.webView.scrollView.contentInset = UIEdgeInsets(top: TitleBarView.maxHeight, left: 0, bottom: 0, right: 0)
 		}
+
+		self.view.addSubview(self.webView)
+		self.view.addConstraints([
+			NSLayoutConstraint(item: self.webView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0),
+			NSLayoutConstraint(item: self.webView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
+			NSLayoutConstraint(item: self.webView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
+			NSLayoutConstraint(item: self.webView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0),
+			])
 	}
 	
 	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -215,10 +227,9 @@ open class SafarishViewController: UIViewController {
 	
 	open override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-        self.setupViews()
 		self.loadInitialContent()
 		self.navigationController?.setNavigationBarHidden(false, animated: true)
-		if !self.isIPad { self.navigationController?.setToolbarHidden(false, animated: true) }
+		self.navigationController?.setToolbarHidden(self.isIPad, animated: true) 
 		//self.setupNavigationItem()
 	}
 	
@@ -299,33 +310,33 @@ extension SafarishViewController {
 }
 
 extension SafarishViewController: WKNavigationDelegate {
-	public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
+	open func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
 		decisionHandler(.allow)
 	}
 	
-	public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Swift.Void) {
+	open func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Swift.Void) {
 		decisionHandler(.allow)
 	}
 	
-	public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+	open func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
 		self.updateURLField()
 	}
 	
-	public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+	open func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		self.updateURLField()
 		self.shouldObserveEstimatedProgress = true
 	}
 	
-	public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+	open func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
 		//self.titleBar?.makeFullyVisible(animated: true)
 	}
 	
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 		self.shouldObserveEstimatedProgress = false
 		self.updateBarButtons()
     }
     
-	public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+	open func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 		if (error as NSError).domain == "NSURLErrorDomain", (error as NSError).code == -1003 {		//couldn't find host, switch to google
 			guard let current = self.url, let url = URL(string: "https://www.google.com/#q=\(current.absoluteString)") else { return }
 			self.webView.load(URLRequest(url: url))
@@ -340,7 +351,7 @@ extension SafarishViewController: WKNavigationDelegate {
 		print("Provisional load failed: \(error)")
 	}
 	
-	public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+	open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		self.shouldObserveEstimatedProgress = false
 	}
 	

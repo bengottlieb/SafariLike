@@ -109,7 +109,6 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 	
 	@objc func clearSelectAll() {
 		if self.fieldFakeSelectAllEnabled {
-			self.fieldFakeSelectAllEnabled = false
 			self.urlFieldChanged()
 			if let position = self.field.position(from: self.field.endOfDocument, offset: -1) {
 				self.field.selectedTextRange = self.field.textRange(from: position, to: position)
@@ -118,7 +117,7 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 	}
 	
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-		if let text = self.field.text, !text.isEmpty, let url = URL(string: "https://" + text) {
+		if let url = URL(fragment: textField.text) {
 			self.url = url
 			self.safarishViewController?.didEnterURL(url)
 		} else {
@@ -129,8 +128,11 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 	}
 	
 	@objc func urlFieldChanged() {
-		let text = self.field.text
-		self.field.attributedText = NSAttributedString(string: text ?? "", attributes: [.font: self.field.font!, .foregroundColor: self.field.textColor!])
+		if self.fieldFakeSelectAllEnabled {
+			self.fieldFakeSelectAllEnabled = false
+			let text = self.field.text
+			self.field.attributedText = NSAttributedString(string: text ?? "", attributes: [.font: self.field.font!, .foregroundColor: self.field.textColor!])
+		}
 	}
 	
 	func makeFieldEditable(_ editable: Bool) {
@@ -184,5 +186,17 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 	@objc func cancelEditing() {
 		self.field.text = self.url?.prettyURLString
 		self.makeFieldEditable(false)
+	}
+}
+
+extension URL {
+	init?(fragment: String?) {
+		guard let frag = fragment, !fragment.isEmpty else { self.init(string: ""); return nil }
+		
+		if let components = URLComponents(string: frag), components.scheme != nil {
+			self.init(string: frag)
+		} else {
+			self.init(string: "https://" + frag)
+		}
 	}
 }

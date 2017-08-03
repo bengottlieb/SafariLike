@@ -40,7 +40,9 @@ class SafarishNavigationTitleView: UIView {
 
 		self.leftToolbar = UIToolbar(frame: .zero)
 		self.rightToolbar = UIToolbar(frame: .zero)
-		
+		self.leftToolbar.backgroundColor = .clear
+		self.rightToolbar.backgroundColor = .clear
+
 		self.addSubview(self.leftToolbar)
 		self.addSubview(self.urlField)
 		self.addSubview(self.rightToolbar)
@@ -72,8 +74,8 @@ class SafarishNavigationTitleView: UIView {
 			NSLayoutConstraint(item: self.rightToolbar, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: 0),
 			NSLayoutConstraint(item: self.rightToolbar, attribute: .left, relatedBy: .equal, toItem: self.urlField, attribute: .right, multiplier: 1, constant: 0),
 			
-			NSLayoutConstraint(item: self.leftToolbar, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: 0),
-			NSLayoutConstraint(item: self.rightToolbar, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: 0),
+			NSLayoutConstraint(item: self.leftToolbar, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -2),
+			NSLayoutConstraint(item: self.rightToolbar, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -2),
 			NSLayoutConstraint(item: self.leftToolbar, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0),
 			NSLayoutConstraint(item: self.rightToolbar, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0),
 
