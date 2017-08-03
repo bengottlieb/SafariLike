@@ -39,6 +39,8 @@ open class SafarishViewController: UIViewController {
 
 	public var maximumNavigationScrollTranslation: CGFloat = 24
 	public var scrollableNavigationBar: UINavigationBar?
+	var currentTopOffset: CGFloat = -64
+	
 	public var forceHTTP = false
 	
 	var webView: WKWebView!
@@ -366,12 +368,25 @@ extension SafarishViewController: WKNavigationDelegate {
 extension SafarishViewController: UIScrollViewDelegate {
 	public func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		guard let bar = self.scrollableNavigationBar else { return }
-		var yOffset = -(scrollView.contentOffset.y + 64)
+		var yOffset = -(scrollView.contentOffset.y - self.currentTopOffset)
 		if yOffset < -self.maximumNavigationScrollTranslation { yOffset = -self.maximumNavigationScrollTranslation }
 		if yOffset > 0 { yOffset = 0 }
 		
 		if bar.transform.ty == yOffset { return }
 		self.titleView?.navigationBarScrollPercentage = abs(yOffset / self.maximumNavigationScrollTranslation)
 		bar.transform = CGAffineTransform(translationX: 0, y: yOffset)
+	}
+	
+	public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+		self.currentTopOffset = scrollView.contentOffset.y
+	}
+	
+	public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+		if !decelerate { self.currentTopOffset = scrollView.contentOffset.y }
+	}
+	
+	public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+		
+		
 	}
 }
