@@ -21,6 +21,7 @@ class SafarishURLEntryField: UIView {
 	weak var safarishViewController: SafarishViewController!
 	var navigationBarScrollPercentage: CGFloat = 0.0 { didSet { self.updateShrinkage() }}
 
+	var reloadButton: UIButton!
 	var fieldBackground: UIView!
 	var backgroundHeight: CGFloat = 30
 	var url: URL? { didSet {
@@ -38,7 +39,7 @@ class SafarishURLEntryField: UIView {
 		self.fieldBackground = UIView(frame: .zero)
 		self.fieldBackground.backgroundColor = UIColor(white: 0.85, alpha: 1.0)
 		self.fieldBackground.translatesAutoresizingMaskIntoConstraints = false
-		self.fieldBackground.layer.cornerRadius = 4
+		self.fieldBackground.layer.cornerRadius = 8
 		self.fieldBackground.layer.masksToBounds = true
 		self.addSubview(self.fieldBackground)
 		self.backgroundRightConstraint = NSLayoutConstraint(item: self.fieldBackground, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: 0)
@@ -70,6 +71,18 @@ class SafarishURLEntryField: UIView {
 			NSLayoutConstraint(item: self.field, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 1),
 		])
 		
+		self.reloadButton = UIButton(type: .custom)
+		self.reloadButton.setImage(UIImage(named: "safarish-refresh", in: Bundle(for: SafarishViewController.self), compatibleWith: nil), for: .normal)
+		self.reloadButton.sizeToFit()
+		self.reloadButton.translatesAutoresizingMaskIntoConstraints = false
+		self.reloadButton.showsTouchWhenHighlighted = true
+		self.reloadButton.addTarget(self, action: #selector(reload), for: .touchUpInside)
+		self.fieldBackground.addSubview(self.reloadButton)
+		self.addConstraints([
+			NSLayoutConstraint(item: self.reloadButton, attribute: .right, relatedBy: .equal, toItem: self.fieldBackground, attribute: .right, multiplier: 1.0, constant: -10),
+			NSLayoutConstraint(item: self.reloadButton, attribute: .centerY, relatedBy: .equal, toItem: self.fieldBackground, attribute: .centerY, multiplier: 1.0, constant: 0),
+		])
+
 		
 		self.label = UILabel(frame: .zero)
 		self.label.translatesAutoresizingMaskIntoConstraints = false
@@ -104,6 +117,10 @@ class SafarishURLEntryField: UIView {
 		self.label.font = UIFont.systemFont(ofSize: minFontSize + (self.fontSize - minFontSize) * (1 - self.navigationBarScrollPercentage))
 
 		self.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
+	}
+	
+	@objc func reload() {
+		self.safarishViewController?.reload()
 	}
 }
 
@@ -156,7 +173,7 @@ extension SafarishURLEntryField: UITextFieldDelegate {
 		self.label.isHidden = false
 		self.labelCenterConstraint.isActive = !editable
 		self.labelLeftConstraint.isActive = editable
-		
+		self.reloadButton.isHidden = editable
 		if self.shouldShowCancelButton {
 			if self.cancelButton == nil {
 				self.cancelButton = UIButton(type: .system)

@@ -125,6 +125,9 @@ open class SafarishViewController: UIViewController {
 		self.loadNavigationBarButtonItems()
 	}
 	
+	public func reload() {
+		self.webView.reload()
+	}
 	
 	var shouldObserveEstimatedProgress: Bool = false {
 		didSet {

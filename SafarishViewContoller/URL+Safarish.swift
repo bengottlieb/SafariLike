@@ -22,7 +22,10 @@ extension URL {
 		if self.absoluteString == "about:blank" { return "" }
 		
 		if let host = self.host, !host.isEmpty { string += host }
-		if self.path.isEmpty { string += "/" + self.path}
+		if !self.path.isEmpty {
+			if !self.path.hasPrefix("/") && !string.hasSuffix("/") { string += "/" }
+			string += self.path
+		}
 		
 		return string
 	}
