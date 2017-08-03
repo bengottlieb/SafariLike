@@ -107,10 +107,17 @@ class SafarishNavigationTitleView: UIView {
 	}
 	
 	func updateShrinkage() {
+		let newAlpha = (1.0 - self.navigationBarScrollPercentage) * (1.0 - self.navigationBarScrollPercentage)
+
 		self.urlField.navigationBarScrollPercentage = self.navigationBarScrollPercentage
-		self.leftToolbar.alpha = 1.0 - self.navigationBarScrollPercentage
-		self.rightToolbar.alpha = 1.0 - self.navigationBarScrollPercentage
+		self.leftToolbar.alpha = newAlpha
+		self.rightToolbar.alpha = newAlpha
 		
+		let toolbarTranslation: CGFloat = 20
+		let toolbarScale = (1.0 - self.navigationBarScrollPercentage) / max(0.0001, 1.0 - self.navigationBarScrollPercentage)
+		self.leftToolbar.transform = CGAffineTransform(translationX: toolbarTranslation * self.navigationBarScrollPercentage, y: 0).scaledBy(x: toolbarScale, y: toolbarScale)
+		self.rightToolbar.transform = CGAffineTransform(translationX: -toolbarTranslation * self.navigationBarScrollPercentage, y: 0).scaledBy(x: toolbarScale, y: toolbarScale)
+
 		self.leftToolbar.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
 		self.rightToolbar.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
 
@@ -123,6 +130,7 @@ class SafarishNavigationTitleView: UIView {
 		let maxWidth = max(leftWidth, rightWidth)
 		self.leftToolbarWidthConstraint.constant = maxWidth
 		self.rightToolbarWidthConstraint.constant = maxWidth
+		
 		self.setNeedsLayout()
 	}
 	

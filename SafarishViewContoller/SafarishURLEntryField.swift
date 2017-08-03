@@ -9,6 +9,7 @@
 import UIKit
 
 class SafarishURLEntryField: UIView {
+	var fontSize: CGFloat = 15
 	var field: UITextField!
 	var label: UILabel!
 	var labelCenterConstraint: NSLayoutConstraint!
@@ -57,6 +58,7 @@ class SafarishURLEntryField: UIView {
 		self.field.adjustsFontSizeToFitWidth = true
 		self.field.returnKeyType = .go
 		self.field.clipsToBounds = false
+		self.field.font = UIFont.systemFont(ofSize: self.fontSize)
 		self.field.delegate = self
 		self.field.isHidden = true
 		self.addSubview(self.field)
@@ -73,6 +75,7 @@ class SafarishURLEntryField: UIView {
 		self.label.translatesAutoresizingMaskIntoConstraints = false
 		self.label.textAlignment = .center
 		self.label.adjustsFontSizeToFitWidth = true
+		self.label.font = UIFont.systemFont(ofSize: self.fontSize)
 		self.addSubview(self.label)
 		self.labelCenterConstraint = NSLayoutConstraint(item: self.label, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1.0, constant: 5)
 		self.labelLeftConstraint = NSLayoutConstraint(item: self.label, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 10)
@@ -92,8 +95,14 @@ class SafarishURLEntryField: UIView {
 	}
 	
 	func updateShrinkage() {
-		self.fieldBackground.alpha = 1.0 - self.navigationBarScrollPercentage
+		let newAlpha = (1.0 - self.navigationBarScrollPercentage) * (1.0 - self.navigationBarScrollPercentage)
+		self.fieldBackground.alpha = newAlpha
 		self.label.transform = CGAffineTransform(translationX: 0, y: 10 * self.navigationBarScrollPercentage)
+		self.fieldBackground.transform = CGAffineTransform(translationX: 0, y: 10 * self.navigationBarScrollPercentage)
+
+		let minFontSize: CGFloat = 10
+		self.label.font = UIFont.systemFont(ofSize: minFontSize + (self.fontSize - minFontSize) * (1 - self.navigationBarScrollPercentage))
+
 		self.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
 	}
 }
