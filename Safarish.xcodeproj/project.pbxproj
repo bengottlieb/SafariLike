@@ -17,6 +17,8 @@
 		B5C7F37A1E14127200D1E245 /* SafarishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7F3761E14127200D1E245 /* SafarishViewController.swift */; };
 		B5DD3ADE1F2AA9D8000519FB /* SafarishURLEntryField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */; };
 		B5E36BCC1F2BB252004D357A /* URL+Safarish.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */; };
+		B5F68BDF21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68BDD21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift */; };
+		B5F68BE021DABD0F008FB9FE /* SafarishViewController+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68BDE21DABD0F008FB9FE /* SafarishViewController+Delegates.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,6 +46,8 @@
 		B5C7F3761E14127200D1E245 /* SafarishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafarishViewController.swift; sourceTree = "<group>"; };
 		B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishURLEntryField.swift; sourceTree = "<group>"; };
 		B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Safarish.swift"; sourceTree = "<group>"; };
+		B5F68BDD21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SafarishVIewController+SubNavViews.swift"; sourceTree = "<group>"; };
+		B5F68BDE21DABD0F008FB9FE /* SafarishViewController+Delegates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SafarishViewController+Delegates.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +106,8 @@
 				B5C7F3761E14127200D1E245 /* SafarishViewController.swift */,
 				B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */,
 				B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */,
+				B5F68BDE21DABD0F008FB9FE /* SafarishViewController+Delegates.swift */,
+				B5F68BDD21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift */,
 				B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */,
 			);
 			path = SafarishViewContoller;
@@ -135,12 +141,13 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0820;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = "Stand Alone, Inc.";
 				TargetAttributes = {
 					B58FE3471E06E05800C46CD8 = {
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = YY6CWUX533;
+						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -184,8 +191,10 @@
 			files = (
 				B5DD3ADE1F2AA9D8000519FB /* SafarishURLEntryField.swift in Sources */,
 				B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */,
+				B5F68BE021DABD0F008FB9FE /* SafarishViewController+Delegates.swift in Sources */,
 				B5C7F37A1E14127200D1E245 /* SafarishViewController.swift in Sources */,
 				B5815CF81F2B4A5F007541AE /* SafarishNavigationTitleView.swift in Sources */,
+				B5F68BDF21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift in Sources */,
 				B5E36BCC1F2BB252004D357A /* URL+Safarish.swift in Sources */,
 				B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */,
 			);
@@ -207,6 +216,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -214,6 +224,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -240,7 +251,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -264,6 +275,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -271,6 +283,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -291,7 +304,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -311,10 +324,10 @@
 					"$(PROJECT_DIR)/Safarish/Frameworks",
 				);
 				INFOPLIST_FILE = Safarish/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.safarish;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -328,10 +341,10 @@
 					"$(PROJECT_DIR)/Safarish/Frameworks",
 				);
 				INFOPLIST_FILE = Safarish/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.standalone.safarish;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};

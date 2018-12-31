@@ -8,95 +8,179 @@
 
 import UIKit
 
-class SafarishNavigationTitleView: UIView {
+extension UIBarButtonItem {
+	static var defaultSafarishItemWidth: CGFloat = 40
+}
+
+
+protocol SafarishNavigationTitleView {
+	var isEnabled: Bool { get set }
+	var isEditing: Bool { get set }
+
+	var areNavigationControlsHidden: Bool { get set }
+	var estimatedProgress: CGFloat? { get set }
+	var viewWidth: CGFloat { get set }
+	var shrinkPercentage: CGFloat { get set }
+	var rightBarButtonItems: [UIBarButtonItem] { get set }
+	var leftBarButtonItems: [UIBarButtonItem] { get set }
+	var currentURL: URL? { get set }
+	var drawBottomDivider: Bool { get set }
+}
+
+class SafarishNavigationURLView: UIView, SafarishNavigationTitleView {
 	var estimatedProgress: CGFloat? { didSet { self.setNeedsDisplay() }}
 	
 	var urlField: SafarishURLEntryField!
 	var parent: SafarishViewController!
 	var leftToolbar: UIToolbar!
 	var rightToolbar: UIToolbar!
-	var navigationBarScrollPercentage: CGFloat = 0.0 { didSet { self.updateShrinkage() }}
+	var enabledAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.black] { didSet { self.urlField.enabledAttributes = self.enabledAttributes }}
+	var disabledAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.black] { didSet { self.urlField.disabledAttributes = self.disabledAttributes }}
+	var shrinkPercentage: CGFloat = 0.0 { didSet { self.updateShrinkage() }}
+	var drawBottomDivider = true { didSet { self.setNeedsDisplay() }}
+	var areNavigationControlsHidden: Bool = false { didSet {
+		self.isURLFieldHidden = self.areNavigationControlsHidden
+	}}
 	
-	var viewWidth: CGFloat = 740 { didSet {
-		self.mainWidthConstraint.constant = self.viewWidth - 28
+	override var frame: CGRect { didSet { self.updateFrame() } }
+	override var bounds: CGRect { didSet { self.updateFrame() } }
+
+	override func didMoveToSuperview() {
+		self.updateFrame()
+	}
+	
+	func updateFrame() {
+		if let sv = self.superview, self.frame.width != sv.bounds.width {
+			var rect = self.frame
+			rect.size.width = sv.bounds.width
+			rect.origin.x = 0
+			self.frame = rect
+		}
+	}
+	
+	var isURLFieldHidden: Bool {
+		get { return self.urlField?.isHidden ?? true }
+		set { self.urlField?.isHidden = newValue }
+	}
+
+	var isEnabled: Bool {
+		get { return self.urlField?.isEnabled ?? false }
+		set { self.urlField?.isEnabled = newValue }
+	}
+	
+	var isEditing: Bool {
+		get { return self.urlField?.isEditing ?? false }
+		set {
+			if newValue {
+				self.urlField?.beginEditing(recog: nil)
+			} else {
+				self.urlField?.finishEditing()
+			}
+		}
+	}
+	
+	var currentURL: URL? {
+		get { return self.urlField?.url }
+		set { self.urlField?.url = newValue }
+	}
+	
+	var viewWidth: CGFloat = 768 { didSet {
+		self.mainWidthConstraint.constant = self.viewWidth
 	}}
 	
 	var leftBarButtonItems: [UIBarButtonItem] = [] { didSet {
-		self.leftToolbar.items = self.leftBarButtonItems
-		self.updateToolbarWidths()
+		if (self.leftToolbar?.items ?? []) != self.leftBarButtonItems {
+			self.leftToolbar?.items = self.leftBarButtonItems
+			self.updateToolbarWidths()
+		}
 	}}
 
 	var rightBarButtonItems: [UIBarButtonItem] = [] { didSet {
-		self.rightToolbar.items = self.rightBarButtonItems
-		self.updateToolbarWidths()
+		if (self.rightToolbar?.items ?? []) != self.rightBarButtonItems {
+			self.rightToolbar.items = self.rightBarButtonItems
+			self.updateToolbarWidths()
+		}
 	}}
 
-	convenience init(in parent: SafarishViewController) {
-		self.init(frame: CGRect(x: 0, y: 0, width: 740, height: 44))
-		self.translatesAutoresizingMaskIntoConstraints = false
+	init(in parent: SafarishViewController) {
+		super.init(frame: CGRect(x: 0, y: 0, width: 740, height: 44))
+	//	self.translatesAutoresizingMaskIntoConstraints = false
+		self.mainWidthConstraint = self.widthAnchor.constraint(equalToConstant: self.bounds.width)
+		self.mainWidthConstraint.isActive = true
+		
+		self.heightAnchor.constraint(equalToConstant: self.bounds.height).isActive = true
+		
 
 		self.parent = parent
 		self.urlField = SafarishURLEntryField(in: parent)
 		self.backgroundColor = .clear
+		self.urlField?.translatesAutoresizingMaskIntoConstraints = false
+		self.urlField?.safarishViewController = parent
+		self.urlField.enabledAttributes = self.enabledAttributes
+		self.urlField.disabledAttributes = self.disabledAttributes
 
-		self.leftToolbar = UIToolbar(frame: .zero)
-		self.rightToolbar = UIToolbar(frame: .zero)
-		self.leftToolbar.backgroundColor = .clear
-		self.rightToolbar.backgroundColor = .clear
-
-		self.addSubview(self.leftToolbar)
 		self.addSubview(self.urlField)
-		self.addSubview(self.rightToolbar)
-		self.urlField.translatesAutoresizingMaskIntoConstraints = false
-		self.leftToolbar.translatesAutoresizingMaskIntoConstraints = false
-		self.rightToolbar.translatesAutoresizingMaskIntoConstraints = false
-		self.urlField.safarishViewController = parent
-		
-		let nullImage = UIImage()
-		self.leftToolbar.setShadowImage(nullImage, forToolbarPosition: .any)
-		self.rightToolbar.setShadowImage(nullImage, forToolbarPosition: .any)
+		if parent.isIPad {
+			self.leftToolbar = UIToolbar(frame: .zero)
+			self.rightToolbar = UIToolbar(frame: .zero)
+			self.leftToolbar.backgroundColor = .clear
+			self.rightToolbar.backgroundColor = .clear
 
-		self.urlField.addConstraints([
-			//NSLayoutConstraint(item: self.urlField, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 400),
-			NSLayoutConstraint(item: self.urlField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 44)
-		])
-		
-		self.mainWidthConstraint = NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.bounds.width)
-		self.leftToolbarWidthConstraint = NSLayoutConstraint(item: self.leftToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 0)
-		self.rightToolbarWidthConstraint = NSLayoutConstraint(item: self.rightToolbar, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 0)
-
-		self.addConstraints([
-			self.mainWidthConstraint,
-			NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: self.bounds.height),
-			NSLayoutConstraint(item: self.urlField, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
+			self.addSubview(self.leftToolbar)
+			self.addSubview(self.rightToolbar)
+			self.leftToolbar.translatesAutoresizingMaskIntoConstraints = false
+			self.rightToolbar.translatesAutoresizingMaskIntoConstraints = false
 			
-			NSLayoutConstraint(item: self.leftToolbar, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 0),
-			NSLayoutConstraint(item: self.leftToolbar, attribute: .right, relatedBy: .equal, toItem: self.urlField, attribute: .left, multiplier: 1, constant: 0),
-			NSLayoutConstraint(item: self.rightToolbar, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: 0),
-			NSLayoutConstraint(item: self.rightToolbar, attribute: .left, relatedBy: .equal, toItem: self.urlField, attribute: .right, multiplier: 1, constant: 0),
-			
-			NSLayoutConstraint(item: self.leftToolbar, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -2),
-			NSLayoutConstraint(item: self.rightToolbar, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -2),
-			NSLayoutConstraint(item: self.leftToolbar, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0),
-			NSLayoutConstraint(item: self.rightToolbar, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0),
+			let nullImage = UIImage()
+			self.leftToolbar.setShadowImage(nullImage, forToolbarPosition: .any)
+			self.rightToolbar.setShadowImage(nullImage, forToolbarPosition: .any)
+			self.leftToolbar.setBackgroundImage(nullImage, forToolbarPosition: .any, barMetrics: .default)
+			self.rightToolbar.setBackgroundImage(nullImage, forToolbarPosition: .any, barMetrics: .default)
 
-		])
-		
-		self.leftToolbar.addConstraint(self.leftToolbarWidthConstraint)
-		self.rightToolbar.addConstraint(self.rightToolbarWidthConstraint)
-		
+			self.urlField.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
+			self.urlField.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor, constant: 20).isActive = true
+			self.urlField.heightAnchor.constraint(equalToConstant: 44).isActive = true
+
+			self.leftToolbar.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+			self.leftToolbar.trailingAnchor.constraint(equalTo: self.urlField.leadingAnchor, constant: 0).isActive = true
+			self.leftToolbar.heightAnchor.constraint(equalTo: self.heightAnchor, constant: -5).isActive = true
+			self.leftToolbar.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
+
+			self.rightToolbar.leadingAnchor.constraint(equalTo: self.urlField.trailingAnchor, constant: 0).isActive = true
+			self.rightToolbar.leadingAnchor.constraint(equalTo: self.urlField.trailingAnchor, constant: 0).priority = UILayoutPriority(750)
+			self.rightToolbar.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+			self.rightToolbar.heightAnchor.constraint(equalTo: self.heightAnchor, constant: -5).isActive = true
+			self.rightToolbar.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
+			
+			self.leftToolbarWidthConstraint = self.leftToolbar.widthAnchor.constraint(equalToConstant: 100)
+			self.leftToolbarWidthConstraint.isActive = true
+
+			self.rightToolbarWidthConstraint = self.rightToolbar.widthAnchor.constraint(equalToConstant: 100)
+			self.rightToolbarWidthConstraint.isActive = true
+		} else {
+			self.urlField.heightAnchor.constraint(equalToConstant: 44).isActive = true
+			self.urlField.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
+			self.urlField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+			self.urlField.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -18).isActive = true
+		}
+
 		self.updateToolbarWidths()
+		self.isURLFieldHidden = self.areNavigationControlsHidden
 	}
 	
+	required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+	
 	override func draw(_ rect: CGRect) {
-		let lineWidth = 1.0 / UIScreen.main.scale
-		let bezier = UIBezierPath()
-		let bounds = self.bounds
-		UIColor.lightGray.setStroke()
-		bezier.move(to: CGPoint(x: 0, y: bounds.height - lineWidth))
-		bezier.addLine(to: CGPoint(x: bounds.width, y: bounds.height - lineWidth))
-		bezier.lineWidth = lineWidth
-		bezier.stroke()
+		if self.drawBottomDivider {
+			let lineWidth = 1.0 / UIScreen.main.scale
+			let bezier = UIBezierPath()
+			let bounds = self.bounds
+			UIColor.lightGray.setStroke()
+			bezier.move(to: CGPoint(x: 0, y: bounds.height - lineWidth))
+			bezier.addLine(to: CGPoint(x: bounds.width, y: bounds.height - lineWidth))
+			bezier.lineWidth = lineWidth
+			bezier.stroke()
+		}
 		
 		if let progress = self.estimatedProgress, progress < 1.0 {
 			let progressHeight: CGFloat = 3.0
@@ -107,29 +191,31 @@ class SafarishNavigationTitleView: UIView {
 	}
 	
 	func updateShrinkage() {
-		let newAlpha = (1.0 - self.navigationBarScrollPercentage) * (1.0 - self.navigationBarScrollPercentage)
+		let newAlpha = (1.0 - self.shrinkPercentage) * (1.0 - self.shrinkPercentage)
 
-		self.urlField.navigationBarScrollPercentage = self.navigationBarScrollPercentage
-		self.leftToolbar.alpha = newAlpha
-		self.rightToolbar.alpha = newAlpha
+		self.urlField?.shrinkPercentage = self.shrinkPercentage
+		self.leftToolbar?.alpha = newAlpha
+		self.rightToolbar?.alpha = newAlpha
 		
 		let toolbarTranslation: CGFloat = 20
-		let toolbarScale = (1.0 - self.navigationBarScrollPercentage) / max(0.0001, 1.0 - self.navigationBarScrollPercentage)
-		self.leftToolbar.transform = CGAffineTransform(translationX: toolbarTranslation * self.navigationBarScrollPercentage, y: 0).scaledBy(x: toolbarScale, y: toolbarScale)
-		self.rightToolbar.transform = CGAffineTransform(translationX: -toolbarTranslation * self.navigationBarScrollPercentage, y: 0).scaledBy(x: toolbarScale, y: toolbarScale)
+		let toolbarScale = (1.0 - self.shrinkPercentage) / max(0.0001, 1.0 - self.shrinkPercentage)
+		self.leftToolbar?.transform = CGAffineTransform(translationX: toolbarTranslation * self.shrinkPercentage, y: 0).scaledBy(x: toolbarScale, y: toolbarScale)
+		self.rightToolbar?.transform = CGAffineTransform(translationX: -toolbarTranslation * self.shrinkPercentage, y: 0).scaledBy(x: toolbarScale, y: toolbarScale)
 
-		self.leftToolbar.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
-		self.rightToolbar.isUserInteractionEnabled = self.navigationBarScrollPercentage == 0.0
-
-		print("now scrolled to \(self.navigationBarScrollPercentage)")
+		self.leftToolbar?.isUserInteractionEnabled = self.shrinkPercentage == 0.0
+		self.rightToolbar?.isUserInteractionEnabled = self.shrinkPercentage == 0.0
 	}
 
 	func updateToolbarWidths() {
-		let leftWidth = self.leftToolbar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0
-		let rightWidth = self.rightToolbar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0
+		guard let leftBar = self.leftToolbar, let rightBar = self.rightToolbar else { return }
+		let leftWidth = leftBar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0
+		let rightWidth = rightBar.items?.reduce(0) { $0 + $1.width + 15 } ?? 0
 		let maxWidth = max(leftWidth, rightWidth)
 		self.leftToolbarWidthConstraint.constant = maxWidth
 		self.rightToolbarWidthConstraint.constant = maxWidth
+		
+		leftBar.setNeedsLayout()
+		self.rightToolbar.setNeedsLayout()
 		
 		self.setNeedsLayout()
 	}

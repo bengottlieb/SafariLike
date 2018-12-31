@@ -10,16 +10,17 @@ import Foundation
 
 
 extension URL {
+	static let blank = URL(string: "about:blank")!
 	var prettyName: String? {
 		let components = URLComponents(url: self, resolvingAgainstBaseURL: false)
 		var name = components?.host ?? ""
-		if name.hasPrefix("www.") { name = name.substring(from: name.index(name.startIndex, offsetBy: 4)) }
+		if name.hasPrefix("www.") { name = String(name[name.index(name.startIndex, offsetBy: 4)...]) }
 		return name
 	}
 	
 	var prettyURLString: String? {
 		var string = ""
-		if self.absoluteString == "about:blank" { return "" }
+		if self == URL.blank { return "" }
 		
 		if let host = self.host, !host.isEmpty { string += host }
 		if !self.path.isEmpty {
@@ -35,5 +36,26 @@ extension URL {
 		if components.scheme == "http" { components.scheme = "https" }
 		if components.path == "/" { components.path = "" }
 		return components.url ??  self
+	}
+	
+	init?(fragment: String) {
+		if URL(string: fragment) != nil {
+			self.init(string: fragment)
+		} else {
+			self.init(string: "https://" + fragment)
+		}
+	}
+	
+	public static func build(from fragment: String, completion: @escaping (URL?) -> Void) {
+		guard let url = URL(string: fragment), var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+			completion(nil)
+			return
+		}
+		
+		if (components.scheme ?? "").isEmpty {
+			components.scheme = "https"
+		}
+		
+		completion(components.url)
 	}
 }

@@ -12,21 +12,11 @@ import WebKit
 public typealias BarButtonItemsSet = (left: [UIBarButtonItem], right: [UIBarButtonItem])
 
 open class SafarishViewController: UIViewController {
-	static let blankURL = URL(string: "about:blank")!
 	deinit {
 		self.clearOut()
 	}
 	
-//	override open var toolbarItems: [UIBarButtonItem]? { didSet {
-//		if let items = self.toolbarItems {
-//			let midpoint = items.count / 2
-//			self.barButtonItems = (left: Array(items[..<midpoint]), right: Array(items[midpoint...]))
-//		}
-//	}}
-	open var barButtonItems: BarButtonItemsSet! { didSet {
-		self.loadNavigationBarButtonItems()
-	}}
-
+	open var barButtonItems: BarButtonItemsSet! { didSet { self.loadBarButtonItems() }}
 	public var forceCenteredURLBar = false
 	public var doneButtonTitle = NSLocalizedString("Done", comment: "Done")
     open var doneButtonItem: UIBarButtonItem!
@@ -35,21 +25,70 @@ open class SafarishViewController: UIViewController {
 	open var pageBackImage = UIImage(named: "safarish-page-back", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
 	open var pageForwardImage = UIImage(named: "safarish-page-forward", in: Bundle(for: SafarishViewController.self), compatibleWith: nil)
 	open var searchStringTemplate = "https://www.google.com/#q=%@"
-	public var widthDeterminingViewController: UIViewController?
+	open var autoHideToolbar = true
+	open var showBackForwardButtons = true
+	var enabledAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.black] { didSet { (self.titleView as? SafarishNavigationURLView)?.enabledAttributes = self.enabledAttributes }}
+	var disabledAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.black] { didSet { (self.titleView as? SafarishNavigationURLView)?.disabledAttributes = self.disabledAttributes }}
 
-	public var maximumNavigationScrollTranslation: CGFloat = 24
+	open var allowURLEditing = true { didSet {
+		if !self.allowURLEditing { self.urlFieldEnabled = false }
+	}}
+
+	public var minNavigationBarHeight: CGFloat = 20
+	public var maxNavigationBarHeight: CGFloat = 44
+	public var maxNavigationReduction: CGFloat { return self.maxNavigationBarHeight - self.minNavigationBarHeight }
+	var isNavigationBarMinimized = false { didSet {
+		if self.autoHideToolbar {
+			self.navigationController?.setToolbarHidden(self.isNavigationBarMinimized, animated: true)
+		}
+	}}
+	var hasLoaded = false
+	
+	public var widthDeterminingViewController: UIViewController?
+	public var areNavigationControlsHidden: Bool = false { didSet {
+		self.titleView?.areNavigationControlsHidden = self.areNavigationControlsHidden
+		self.barButtonItems.left = self.areNavigationControlsHidden ? [self.doneButtonItem] : [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ]
+		self.loadBarButtonItems()
+	}}
+	
+	var statusBarHeight: CGFloat = 20
 	public var scrollableNavigationBar: UINavigationBar?
-	var currentTopOffset: CGFloat = -64
+	var currentScrollStart: CGFloat = 0
 	
 	public var forceHTTP = false
 	
-	var webView: WKWebView!
-	var url: URL? { didSet { self.titleView?.urlField.url = self.url }}
+	var navigationSubviewHost: UIView!
+	var navigationSubviewInfo: [NavigationSubviewInfo] = []
+	
+	var webView: WKWebView! { didSet {
+		print("Webview: \(self.webView?.description ?? "no web view")")
+	}}
+	var subviewTopConstraint: NSLayoutConstraint!
+	var url: URL? { didSet { self.titleView?.currentURL = self.url }}
 	var currentURL: URL? { return self.webView?.url ?? self.url }
 	var data: Data?
 	var html: String?
-	var titleView: SafarishNavigationTitleView!
+	var titleView: SafarishNavigationTitleView! { didSet {
+		self.navigationItem.titleView = self.titleView as? UIView
+		self.titleView.leftBarButtonItems = oldValue?.leftBarButtonItems ?? []
+		self.titleView.rightBarButtonItems = oldValue?.rightBarButtonItems ?? []
+	}}
+	var isLoading = false {
+		didSet {
+			if self.isLoading == false, oldValue == true {
+				self.didFinishLoading()
+			} else if self.isLoading == true, oldValue == false {
+				self.didStartLoading()
+			}
+		}
+	}
 	var isIPad: Bool { return UIDevice.current.userInterfaceIdiom == .pad }
+	var isBlank: Bool {
+		if let data = self.data, !data.isEmpty { return false }
+		if let html = self.html, !html.isEmpty { return false }
+		if self.url != nil, self.url != URL.blank { return false }
+		return true
+	}
 	
 	public convenience init(url: URL?) {
 		self.init()
@@ -60,7 +99,7 @@ open class SafarishViewController: UIViewController {
 				self.url = url
 			}
 		} else {
-			self.url = SafarishViewController.blankURL
+			self.url = URL.blank
 		}
 		self.setup()
 	}
@@ -79,10 +118,28 @@ open class SafarishViewController: UIViewController {
 		self.setup()
 	}
 	
-	func loadNavigationBarButtonItems() {
-		if self.isIPad {
-			self.titleView.leftBarButtonItems = self.barButtonItems.left
-			self.titleView.rightBarButtonItems = self.barButtonItems.right
+	func unlinkWebView(_ webView: WKWebView?) {
+		webView?.removeFromSuperview()
+		webView?.removeObserver(self, forKeyPath: "title")
+		webView?.removeObserver(self, forKeyPath: "canGoBack")
+		webView?.removeObserver(self, forKeyPath: "canGoForward")
+		webView?.removeObserver(self, forKeyPath: "backForwardList")
+		webView?.removeObserver(self, forKeyPath: "estimatedProgress")
+
+		webView?.scrollView.delegate = nil
+		webView?.navigationDelegate = nil
+		webView?.uiDelegate = nil
+	}
+	
+	func loadBarButtonItems() {
+		if self.isIPad, self.titleView != nil {
+			self.titleView.leftBarButtonItems = self.barButtonItems?.left ?? []
+			self.titleView.rightBarButtonItems = self.barButtonItems?.right ?? []
+			
+			self.titleView.rightBarButtonItems.forEach { item in
+				if item.width == 0 { item.width = UIBarButtonItem.defaultSafarishItemWidth }
+			}
+			
 		} else {
 			self.hidesBottomBarWhenPushed = false
 			self.toolbarItems = (self.barButtonItems.left + self.barButtonItems.right).flatMap({
@@ -92,78 +149,68 @@ open class SafarishViewController: UIViewController {
 		}
 	}
 	
-	func setup() {
-		self.setupNavigationItem()
-	}
+	func setup() { }
 	
-	func setupNavigationItem() {
+	func setupBarButtonItems() {
 		if self.titleView == nil {
-			self.titleView = SafarishNavigationTitleView(in: self)
-			self.navigationItem.titleView = self.titleView
-			self.titleView.urlField.url = self.url
+			self.titleView = SafarishNavigationURLView(in: self)
+			(self.titleView as? UIView)?.tintColor = self.view.tintColor
+			(self.titleView as? SafarishNavigationURLView)?.enabledAttributes = self.enabledAttributes
+			(self.titleView as? SafarishNavigationURLView)?.disabledAttributes = self.disabledAttributes
+			self.titleView.currentURL = self.url
+			self.titleView.areNavigationControlsHidden = self.areNavigationControlsHidden
 		}
 
 		if self.doneButtonItem == nil {
 			self.doneButtonItem = UIBarButtonItem(title: self.doneButtonTitle, style: .plain, target: self, action: #selector(done))
 			self.doneButtonItem.width = 50
-			
-			self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
-			self.pageBackButtonItem.isEnabled = false
-			self.pageBackButtonItem.width = 30
-			self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
-			self.pageForwardButtonItem.isEnabled = false
-			self.pageForwardButtonItem.width = 30
-
-		//	self.toolbarItems = [ self.pageBackButtonItem, self.pageForwardButtonItem ]
-			self.barButtonItems = ( left: [ self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem ], right: [] )
 		}
 		
+		if self.pageBackButtonItem == nil {
+			self.pageBackButtonItem = UIBarButtonItem(image: self.pageBackImage, style: .plain, target: self, action: #selector(pageBack))
+			self.goBackButtonEnabled = false
+			self.pageBackButtonItem.width = UIBarButtonItem.defaultSafarishItemWidth
+		}
+
+		if self.pageForwardButtonItem == nil {
+			self.pageForwardButtonItem = UIBarButtonItem(image: self.pageForwardImage, style: .plain, target: self, action: #selector(pageForward))
+			self.goForwardButtonEnabled = false
+			self.pageForwardButtonItem.width = UIBarButtonItem.defaultSafarishItemWidth
+		}
+		
+		var left: [UIBarButtonItem] = [self.doneButtonItem]
+		if self.showBackForwardButtons { left += [self.pageBackButtonItem, self.pageForwardButtonItem] }
+		self.barButtonItems = ( left: left, right: [] )
+
 		self.navigationItem.leftBarButtonItems = []
 		self.navigationItem.rightBarButtonItems = []
 		self.navigationItem.hidesBackButton = true
 
-		self.loadNavigationBarButtonItems()
+		self.loadBarButtonItems()
 	}
 	
 	public func reload() {
-		self.webView.reload()
-	}
-	
-	var shouldObserveEstimatedProgress: Bool = false {
-		didSet {
-			if self.shouldObserveEstimatedProgress == oldValue { return }
-			
-			if self.shouldObserveEstimatedProgress {
-				self.webView.addObserver(self, forKeyPath: "estimatedProgress", options: [], context: nil)
-			} else {
-				self.webView?.removeObserver(self, forKeyPath: "estimatedProgress")
-			}
-			
-		}
+		self.webView?.reload()
 	}
 	
 	open func load(request: URLRequest) {
 		self.url = request.url
-		self.titleView.urlField.url = self.url
+		self.titleView.currentURL = self.url
 		self.webView.load(request)
 	}
 	
 	func clearOut() {
-		self.webView?.removeObserver(self, forKeyPath: "canGoBack")
-		self.webView?.removeObserver(self, forKeyPath: "canGoForward")
-
-		self.shouldObserveEstimatedProgress = false
-		self.webView?.scrollView.delegate = nil
-		self.webView?.navigationDelegate = nil
-        self.webView = nil
+		self.unlinkWebView(self.webView)
+		self.webView = nil
 	}
 	
 	var webViewConfiguration = WKWebViewConfiguration()
 	var navigationBarWasHidden: Bool?
+	var userAgent: String? { didSet { self.webView?.customUserAgent = self.userAgent }}
 	
 	open override func viewWillAppear(_ animated: Bool) {
-        self.updateNavigationBar()
 		super.viewWillAppear(animated)
+		self.scrollableNavigationBar = self.navigationController?.navigationBar
 	}
 	
 	var canGoBack: Bool {
@@ -174,97 +221,116 @@ open class SafarishViewController: UIViewController {
 	var canGoForward: Bool {
 		return self.webView.canGoForward
 	}
-    
-    func updateNavigationBar() {
-//        if let nav = self.navigationController {
-//            if self.navigationBarWasHidden == nil {
-//                self.navigationBarWasHidden = nav.isNavigationBarHidden
-//            }
-//            self.navigationController?.setNavigationBarHidden(true, animated: false)
-//
-//			if UIDevice.current.userInterfaceIdiom == .phone { self.navigationController?.setToolbarHidden(false, animated: true) }
-//        }
-    }
 	
-	override open func viewDidLoad() {
+	open override func viewDidLoad() {
 		super.viewDidLoad()
-		self.setupViews()
+		
+		self.currentScrollStart = -(self.maxNavigationBarHeight + 20)
+		self.setupBarButtonItems()
 	}
-	
+
 	open override func viewDidLayoutSubviews() {
+		self.statusBarHeight = self.view.safeAreaInsets.top
 		super.viewDidLayoutSubviews()
 		self.titleView.viewWidth = (self.widthDeterminingViewController ?? self).view.bounds.width
+		self.setupViews()
     }
 	
 	open func createWebView(frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
 		return WKWebView(frame: frame, configuration: configuration)
 	}
-    
-    func setupViews() {
-		if self.webView == nil {
-			self.webView = self.createWebView(frame: self.view.bounds, configuration: self.webViewConfiguration)
-			self.view.addSubview(self.webView)
-			self.webView.translatesAutoresizingMaskIntoConstraints = false
-            self.webView.scrollView.delegate = self
-            self.webView.navigationDelegate = self
-			
-			self.webView.addObserver(self, forKeyPath: "canGoBack", options: [], context: nil)
-			self.webView.addObserver(self, forKeyPath: "canGoForward", options: [], context: nil)
-		}
-
-		self.view.addSubview(self.webView)
-		self.view.addConstraints([
-			NSLayoutConstraint(item: self.webView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0),
-			NSLayoutConstraint(item: self.webView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0),
-			NSLayoutConstraint(item: self.webView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0),
-			NSLayoutConstraint(item: self.webView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0),
-			])
+	
+	
+	func linkWebView(_ webView: WKWebView) {
+		self.unlinkWebView(self.webView)
+		
+		self.webView = webView
+		self.webView.scrollView.delegate = self
+		self.webView.navigationDelegate = self
+		self.webView.customUserAgent = self.userAgent
+		
+		self.webView.addObserver(self, forKeyPath: "canGoBack", options: [], context: nil)
+		self.webView.addObserver(self, forKeyPath: "canGoForward", options: [], context: nil)
+		self.webView.addObserver(self, forKeyPath: "backForwardList", options: [], context: nil)
+		self.webView.addObserver(self, forKeyPath: "title", options: [], context: nil)
+		self.webView.addObserver(self, forKeyPath: "estimatedProgress", options: [], context: nil)
+		self.webView.scrollView.contentInsetAdjustmentBehavior = .never
+		
+		var offset = self.currentScrollStart
+		if let view = self.navigationSubviewHost { offset -= view.bounds.height }
+		self.webView.scrollView.contentInset = UIEdgeInsets(top: self.initialContentInset, left: 0, bottom: 0, right: 0)
+		if !self.hasLoaded { self.loadInitialContent() }
 	}
 	
-	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-		if keyPath == "estimatedProgress", self.webView?.url != SafarishViewController.blankURL {
-			self.titleView?.estimatedProgress = CGFloat(self.webView?.estimatedProgress ?? 0)
-			if self.webView.estimatedProgress == 1.0 { self.loadDidFinish(for: self.webView.url) }
-		} else if keyPath == "canGoBack" {
-			self.pageBackButtonItem.isEnabled = self.canGoBack
-		} else if keyPath == "canGoForward" {
-			self.pageForwardButtonItem.isEnabled = self.canGoForward
+	var webviewFrame: CGRect { return self.view.bounds }
+	func setupViews() {
+		if self.webView == nil {
+			let webView = self.createWebView(frame: self.webviewFrame, configuration: self.webViewConfiguration)
+			self.view.addSubview(webView)
+			webView.translatesAutoresizingMaskIntoConstraints = false
+			
+			let topOffset: CGFloat = self.isIPad ? -64 : 0
+			webView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+			webView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+			webView.topAnchor.constraint(equalTo: view.topAnchor, constant: topOffset).isActive = true
+			webView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+			self.linkWebView(webView)
 		}
+		if let view = self.navigationSubviewHost { self.view.bringSubviewToFront(view) }
+	}
+
+	open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+		let progress = CGFloat(webView.estimatedProgress)
+		if self.webView.url == URL.blank { return }
+		if progress != 0.0, !self.isLoading {
+			self.isLoading = true
+		} else if progress == 1.0, self.isLoading {
+			self.isLoading = false
+			self.loadDidFinish(for: self.webView.url)
+		}
+		self.titleView?.estimatedProgress = progress
+	}
+	
+	func updateNavigationButtons() {
+		self.goBackButtonEnabled = self.canGoBack
+		self.goForwardButtonEnabled = self.canGoForward
 	}
 	
 	open override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		self.loadInitialContent()
+		if !self.hasLoaded { self.loadInitialContent() }
 		self.navigationController?.setNavigationBarHidden(false, animated: true)
 		self.navigationController?.setToolbarHidden(self.isIPad, animated: true)
-		self.scrollableNavigationBar = self.navigationController?.navigationBar
-		//self.setupNavigationItem()
+		if self.isBlank { self.titleView?.isEditing = true }
 	}
 	
 	func loadInitialContent() {
+		if self.webView == nil { return }
 		if let data = self.data {
+			self.hasLoaded = true
 			self.updateURLField()
-			_ = self.webView?.load(data, mimeType: "application/x-webarchive", characterEncodingName: "", baseURL: self.url ?? SafarishViewController.blankURL)
-		} else if let url = self.url, url != SafarishViewController.blankURL {
-			self.webView.load(URLRequest(url: url))
-			self.updateURLField()
+			_ = self.webView?.load(data, mimeType: "application/x-webarchive", characterEncodingName: "", baseURL: self.url ?? URL.blank)
 		} else if let html = self.html {
-			self.webView.loadHTMLString(html, baseURL: self.url)
+			self.hasLoaded = true
+			self.webView?.loadHTMLString(html, baseURL: URL(fileURLWithPath: "/"))
+		} else if let url = self.url, url != URL.blank {
+			self.hasLoaded = true
+			self.webView?.load(URLRequest(url: url))
+			self.updateURLField()
 		} else {
+			
 		}
 	}
 
 	open override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
-		self.titleView?.urlField.cancelEditing()
+		self.titleView?.isEditing = false
 	}
 	
 	func didEnterURL(_ url: URL?) {
 		guard let url = url else { return }
 
-		if url != self.url {
-			self.forceHTTP = false
-		}
+		if url != self.url { self.forceHTTP = false }
 		
 		if self.forceHTTP, url.scheme == "https", var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
 			components.scheme = "http"
@@ -291,105 +357,70 @@ open class SafarishViewController: UIViewController {
 		}
 	}
 	
-	open func loadDidFinish(for: URL?) { }
-}
-
-extension SafarishViewController {
-	func updateBarButtons() {
-		self.pageBackButtonItem?.isEnabled = self.canGoBack
-		self.pageForwardButtonItem?.isEnabled = self.canGoForward
+	open func loadDidFinish(for: URL?) {
+		if let title = self.webView?.title, !title.isEmpty {
+			self.title = title
+		}
 	}
 	
-    @objc func pageBack() {
+	open func didStartLoading() {
+		DispatchQueue.main.async { self.resetNavigationBar() }
+
+		if let url = self.webView.url, !url.isFileURL {
+			self.titleView?.currentURL = self.url
+		}
+		
+	}
+	open func didFinishLoading() { }
+	
+	var initialContentInset: CGFloat { return (self.maxNavigationBarHeight + 20 + (self.navigationSubviewHost?.bounds.height ?? 0)) }
+	
+	func resetNavigationBar(animated: Bool = true) {
+		self.currentScrollStart = -(self.maxNavigationBarHeight + 20)
+		self.isNavigationBarMinimized = false
+		UIView.animate(withDuration: animated ? 0.2 : 0.0) {
+			self.titleView.shrinkPercentage = 0.0
+			self.scrollableNavigationBar?.transform = .identity
+		}
+	}
+	
+	@objc func pageBack() {
 		if !self.webView.canGoBack {			// if we started off with a webarchive, we'll need to reload it here
 			self.loadInitialContent()
 		} else {
 			self.webView.goBack()
 		}
-    }
-    
-    @objc func pageForward() {
-        self.webView.goForward()
-    }
+	}
+	
+	@objc func pageForward() {
+		self.webView.goForward()
+	}
+	
+	var goForwardButtonEnabled: Bool = false { didSet { self.pageForwardButtonItem.isEnabled = self.goForwardButtonEnabled }}
+	var goBackButtonEnabled: Bool = false { didSet { self.pageBackButtonItem.isEnabled = self.goBackButtonEnabled }}
+	
+	open func webViewScrollChanged(to: Double) { }
+	open func finishedScrolling(to: Double) { }
+}
+
+extension SafarishViewController {
+	func updateBarButtons() {
+		self.goBackButtonEnabled = self.canGoBack
+		self.goForwardButtonEnabled = self.canGoForward
+	}
 	
 	func updateURLField() {
-		self.titleView?.urlField.url = self.url
-	}
-}
-
-extension SafarishViewController: WKNavigationDelegate {
-	open func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
-		decisionHandler(.allow)
-	}
-	
-	open func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Swift.Void) {
-		decisionHandler(.allow)
-	}
-	
-	open func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-		self.updateURLField()
-	}
-	
-	open func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-		self.updateURLField()
-		self.shouldObserveEstimatedProgress = true
-	}
-	
-	open func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-		//self.titleBar?.makeFullyVisible(animated: true)
-	}
-	
-    open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-		self.shouldObserveEstimatedProgress = false
-		self.updateBarButtons()
-    }
-    
-	open func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-		if (error as NSError).domain == "NSURLErrorDomain", (error as NSError).code == -1003 {		//couldn't find host, switch to google
-			guard let current = self.url, let url = URL(string: "https://www.google.com/#q=\(current.absoluteString)") else { return }
-			self.webView.load(URLRequest(url: url))
-			return
+		if let url = self.webView?.url, !url.isFileURL {
+			self.url = url
 		}
-
-		if (error as NSError).domain == "NSURLErrorDomain", (error as NSError).code == -1200, !self.forceHTTP {		//SSL Error
-			self.forceHTTP = true
-			self.didEnterURL(self.url)
-			return
-		}
-		print("Provisional load failed: \(error)")
-	}
-	
-	open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-		self.shouldObserveEstimatedProgress = false
-	}
-	
-	open func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-		completionHandler(.useCredential, challenge.proposedCredential)
 	}
 }
 
-extension SafarishViewController: UIScrollViewDelegate {
-	public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-		guard let bar = self.scrollableNavigationBar else { return }
-		var yOffset = -(scrollView.contentOffset.y - self.currentTopOffset)
-		if yOffset < -self.maximumNavigationScrollTranslation { yOffset = -self.maximumNavigationScrollTranslation }
-		if yOffset > 0 { yOffset = 0 }
-		
-		if bar.transform.ty == yOffset { return }
-		self.titleView?.navigationBarScrollPercentage = abs(yOffset / self.maximumNavigationScrollTranslation)
-		bar.transform = CGAffineTransform(translationX: 0, y: yOffset)
-	}
-	
-	public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-		self.currentTopOffset = scrollView.contentOffset.y
-	}
-	
-	public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-		if !decelerate { self.currentTopOffset = scrollView.contentOffset.y }
-	}
-	
-	public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-		
-		
+extension SafarishViewController {
+	var urlFieldEnabled: Bool {
+		get { return self.titleView?.isEnabled ?? false }
+		set { self.titleView?.isEnabled = self.allowURLEditing && newValue }
 	}
 }
+
+
