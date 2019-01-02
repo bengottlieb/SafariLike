@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension SafarishViewController {
+extension NavBarSafarishViewController {
 	var navigationSubviewOffset: CGFloat {
 		let navBarHeight = self.navigationController?.navigationBar.bounds.height ?? 0
 		return (self.currentScrollStart) + navBarHeight + self.statusBarHeight

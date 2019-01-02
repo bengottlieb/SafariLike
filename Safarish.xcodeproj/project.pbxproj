@@ -14,11 +14,16 @@
 		B5C7F36E1E132C7700D1E245 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5C7F36C1E132C7700D1E245 /* LaunchScreen.storyboard */; };
 		B5C7F36F1E132C7700D1E245 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5C7F36D1E132C7700D1E245 /* Main.storyboard */; };
 		B5C7F3771E14127200D1E245 /* Safarish.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5C7F3731E14127200D1E245 /* Safarish.xcassets */; };
-		B5C7F37A1E14127200D1E245 /* SafarishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7F3761E14127200D1E245 /* SafarishViewController.swift */; };
+		B5C7F37A1E14127200D1E245 /* NavBarSafarishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7F3761E14127200D1E245 /* NavBarSafarishViewController.swift */; };
 		B5DD3ADE1F2AA9D8000519FB /* SafarishURLEntryField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */; };
 		B5E36BCC1F2BB252004D357A /* URL+Safarish.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */; };
-		B5F68BDF21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68BDD21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift */; };
-		B5F68BE021DABD0F008FB9FE /* SafarishViewController+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68BDE21DABD0F008FB9FE /* SafarishViewController+Delegates.swift */; };
+		B5F68BDF21DABD0F008FB9FE /* NavBarSafarishViewController+SubNavViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68BDD21DABD0F008FB9FE /* NavBarSafarishViewController+SubNavViews.swift */; };
+		B5F68BE021DABD0F008FB9FE /* NavBarSafarishViewController+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68BDE21DABD0F008FB9FE /* NavBarSafarishViewController+Delegates.swift */; };
+		B5F68C0021DB8174008FB9FE /* SafarishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68BFF21DB8174008FB9FE /* SafarishViewController.swift */; };
+		B5F68C0221DB8256008FB9FE /* SafarishViewController+Computed.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68C0121DB8256008FB9FE /* SafarishViewController+Computed.swift */; };
+		B5F68C0421DB82C0008FB9FE /* SafarishViewController+Setup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68C0321DB82C0008FB9FE /* SafarishViewController+Setup.swift */; };
+		B5F68C0621DB8D79008FB9FE /* SafarishViewController+Overrides.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68C0521DB8D79008FB9FE /* SafarishViewController+Overrides.swift */; };
+		B5F68C0821DB926C008FB9FE /* SafarishViewController+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F68C0721DB926C008FB9FE /* SafarishViewController+Delegates.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,11 +48,16 @@
 		B5C7F36C1E132C7700D1E245 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Safarish/LaunchScreen.storyboard; sourceTree = SOURCE_ROOT; };
 		B5C7F36D1E132C7700D1E245 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Safarish/Main.storyboard; sourceTree = SOURCE_ROOT; };
 		B5C7F3731E14127200D1E245 /* Safarish.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Safarish.xcassets; sourceTree = "<group>"; };
-		B5C7F3761E14127200D1E245 /* SafarishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafarishViewController.swift; sourceTree = "<group>"; };
+		B5C7F3761E14127200D1E245 /* NavBarSafarishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavBarSafarishViewController.swift; sourceTree = "<group>"; };
 		B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishURLEntryField.swift; sourceTree = "<group>"; };
 		B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Safarish.swift"; sourceTree = "<group>"; };
-		B5F68BDD21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SafarishVIewController+SubNavViews.swift"; sourceTree = "<group>"; };
-		B5F68BDE21DABD0F008FB9FE /* SafarishViewController+Delegates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SafarishViewController+Delegates.swift"; sourceTree = "<group>"; };
+		B5F68BDD21DABD0F008FB9FE /* NavBarSafarishViewController+SubNavViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NavBarSafarishViewController+SubNavViews.swift"; sourceTree = "<group>"; };
+		B5F68BDE21DABD0F008FB9FE /* NavBarSafarishViewController+Delegates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NavBarSafarishViewController+Delegates.swift"; sourceTree = "<group>"; };
+		B5F68BFF21DB8174008FB9FE /* SafarishViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishViewController.swift; sourceTree = "<group>"; };
+		B5F68C0121DB8256008FB9FE /* SafarishViewController+Computed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SafarishViewController+Computed.swift"; sourceTree = "<group>"; };
+		B5F68C0321DB82C0008FB9FE /* SafarishViewController+Setup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SafarishViewController+Setup.swift"; sourceTree = "<group>"; };
+		B5F68C0521DB8D79008FB9FE /* SafarishViewController+Overrides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SafarishViewController+Overrides.swift"; sourceTree = "<group>"; };
+		B5F68C0721DB926C008FB9FE /* SafarishViewController+Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SafarishViewController+Delegates.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,11 +113,16 @@
 			isa = PBXGroup;
 			children = (
 				B5C7F3731E14127200D1E245 /* Safarish.xcassets */,
-				B5C7F3761E14127200D1E245 /* SafarishViewController.swift */,
+				B5F68BFF21DB8174008FB9FE /* SafarishViewController.swift */,
+				B5F68C0321DB82C0008FB9FE /* SafarishViewController+Setup.swift */,
+				B5F68C0521DB8D79008FB9FE /* SafarishViewController+Overrides.swift */,
+				B5F68C0121DB8256008FB9FE /* SafarishViewController+Computed.swift */,
+				B5F68C0721DB926C008FB9FE /* SafarishViewController+Delegates.swift */,
+				B5C7F3761E14127200D1E245 /* NavBarSafarishViewController.swift */,
 				B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */,
 				B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */,
-				B5F68BDE21DABD0F008FB9FE /* SafarishViewController+Delegates.swift */,
-				B5F68BDD21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift */,
+				B5F68BDE21DABD0F008FB9FE /* NavBarSafarishViewController+Delegates.swift */,
+				B5F68BDD21DABD0F008FB9FE /* NavBarSafarishViewController+SubNavViews.swift */,
 				B5E36BCB1F2BB252004D357A /* URL+Safarish.swift */,
 			);
 			path = SafarishViewContoller;
@@ -189,13 +204,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5F68C0021DB8174008FB9FE /* SafarishViewController.swift in Sources */,
 				B5DD3ADE1F2AA9D8000519FB /* SafarishURLEntryField.swift in Sources */,
 				B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */,
-				B5F68BE021DABD0F008FB9FE /* SafarishViewController+Delegates.swift in Sources */,
-				B5C7F37A1E14127200D1E245 /* SafarishViewController.swift in Sources */,
+				B5F68C0621DB8D79008FB9FE /* SafarishViewController+Overrides.swift in Sources */,
+				B5F68BE021DABD0F008FB9FE /* NavBarSafarishViewController+Delegates.swift in Sources */,
+				B5F68C0421DB82C0008FB9FE /* SafarishViewController+Setup.swift in Sources */,
+				B5C7F37A1E14127200D1E245 /* NavBarSafarishViewController.swift in Sources */,
 				B5815CF81F2B4A5F007541AE /* SafarishNavigationTitleView.swift in Sources */,
-				B5F68BDF21DABD0F008FB9FE /* SafarishVIewController+SubNavViews.swift in Sources */,
+				B5F68BDF21DABD0F008FB9FE /* NavBarSafarishViewController+SubNavViews.swift in Sources */,
+				B5F68C0821DB926C008FB9FE /* SafarishViewController+Delegates.swift in Sources */,
 				B5E36BCC1F2BB252004D357A /* URL+Safarish.swift in Sources */,
+				B5F68C0221DB8256008FB9FE /* SafarishViewController+Computed.swift in Sources */,
 				B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -25,10 +25,10 @@ class ViewController: UIViewController {
 		
 		let url = URL(string: "https://github.com/matteocrippa/awesome-swift")!
 		let wv = SafarishViewController(url: url)
-		wv.barButtonItems = (left: wv.barButtonItems?.left ?? [], right: [
-			UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil),
-			UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil),
-		])
+//		wv.barButtonItems = (left: wv.barButtonItems?.left ?? [], right: [
+//			UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil),
+//			UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil),
+//		])
 		
 		if let nav = self.navigationController {
 			nav.pushViewController(wv, animated: true)

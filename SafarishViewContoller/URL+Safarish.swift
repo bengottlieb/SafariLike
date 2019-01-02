@@ -11,6 +11,8 @@ import Foundation
 
 extension URL {
 	static let blank = URL(string: "about:blank")!
+	public var isEmpty: Bool { return self == URL.blank }
+	
 	var prettyName: String? {
 		let components = URLComponents(url: self, resolvingAgainstBaseURL: false)
 		var name = components?.host ?? ""

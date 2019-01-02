@@ -31,7 +31,7 @@ class SafarishNavigationURLView: UIView, SafarishNavigationTitleView {
 	var estimatedProgress: CGFloat? { didSet { self.setNeedsDisplay() }}
 	
 	var urlField: SafarishURLEntryField!
-	var parent: SafarishViewController!
+	var parent: NavBarSafarishViewController!
 	var leftToolbar: UIToolbar!
 	var rightToolbar: UIToolbar!
 	var enabledAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.black] { didSet { self.urlField.enabledAttributes = self.enabledAttributes }}
@@ -102,7 +102,7 @@ class SafarishNavigationURLView: UIView, SafarishNavigationTitleView {
 		}
 	}}
 
-	init(in parent: SafarishViewController) {
+	init(in parent: NavBarSafarishViewController) {
 		super.init(frame: CGRect(x: 0, y: 0, width: 740, height: 44))
 	//	self.translatesAutoresizingMaskIntoConstraints = false
 		self.mainWidthConstraint = self.widthAnchor.constraint(equalToConstant: self.bounds.width)
@@ -112,10 +112,10 @@ class SafarishNavigationURLView: UIView, SafarishNavigationTitleView {
 		
 
 		self.parent = parent
-		self.urlField = SafarishURLEntryField(in: parent)
+	//	self.urlField = SafarishURLEntryField(in: parent)
 		self.backgroundColor = .clear
 		self.urlField?.translatesAutoresizingMaskIntoConstraints = false
-		self.urlField?.safarishViewController = parent
+//		self.urlField?.safarishViewController = parent
 		self.urlField.enabledAttributes = self.enabledAttributes
 		self.urlField.disabledAttributes = self.disabledAttributes
 
