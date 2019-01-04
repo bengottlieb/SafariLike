@@ -19,7 +19,7 @@ open class NavBarSafarishViewController: UIViewController {
 	open var barButtonItems: BarButtonItemsSet! { didSet { self.loadBarButtonItems() }}
 	public var forceCenteredURLBar = false
 	public var doneButtonTitle = NSLocalizedString("Done", comment: "Done")
-    open var doneButtonItem: UIBarButtonItem!
+	open var doneButtonItem: UIBarButtonItem!
 	open var pageBackButtonItem: UIBarButtonItem!
 	open var pageForwardButtonItem: UIBarButtonItem!
 	open var pageBackImage = UIImage(named: "safarish-page-back", in: Bundle(for: NavBarSafarishViewController.self), compatibleWith: nil)

@@ -11,11 +11,15 @@ import WebKit
 
 extension SafarishViewController {
 	open func updateTopBarHeight() {
-		self.toolbar.frame = self.toolbarFrame
+		self.topbar.frame = self.topbarFrame
 	}
 	
 	open func setup() {
+		self.navigationItem.leftBarButtonItems = [self.doneButtonItem, self.pageBackButtonItem, self.pageForwardButtonItem]
+		
 		if self.webview == nil {
+			self.view.backgroundColor = .white
+			
 			self.webview = self.webviewClass.init(frame: self.webviewFrame)
 			self.webview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 			self.webview.scrollView.contentInsetAdjustmentBehavior = .never
@@ -27,29 +31,34 @@ extension SafarishViewController {
 			self.view.addSubview(self.webview)
 		}
 		
-		if self.toolbar == nil {
-			self.toolbar = UIToolbar(frame: self.toolbarFrame)
-			self.toolbar.barTintColor = .red
-			self.toolbar.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
-			self.view.addSubview(self.toolbar)
+		if self.topbar == nil {
+			self.topbar = SafarishNavigationBar(frame: self.topbarFrame, in: self)
+			self.topbar.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
+			self.view.addSubview(self.topbar)
+			self.topbar.backgroundColor = self.view.backgroundColor
 			
 			self.titleView = SafarishURLEntryField(in: self)
-			self.toolbar.addSubview(self.titleView)
+			self.topbar.urlEntryField = self.titleView
 			self.titleView.url = self.url
-			self.titleView.translatesAutoresizingMaskIntoConstraints = false
-			self.titleView.centerXAnchor.constraint(equalTo: self.toolbar.centerXAnchor).isActive = true
-			self.titleView.centerYAnchor.constraint(equalTo: self.toolbar.centerYAnchor).isActive = true
+			self.topbar.updateNavigationItems()
 		}
 		
-		self.loadContent()
+		self.forwardButtonEnabled = false
+		
+		self.loadInitialContent()
 	}
 	
 	open func setTopBarHeight(_ height: CGFloat) {
-		self.topBarCurrentHeight = height
+		let minHeight = max(20, height)
+		let perc = height / self.topBarMaxHeight
+		self.titleView?.shrinkPercentage = 1.0 - perc
+		self.topbar?.shrinkPercentage = 1.0 - perc
+		self.topBarCurrentHeight = minHeight
 		self.updateTopBarHeight()
 	}
 	
-	open func loadContent() {
+	open func loadInitialContent() {
+		self.backButtonEnabled = false
 		if self.webview == nil { return }
 		if let data = self.data {
 			self.state = .loading
@@ -63,6 +72,5 @@ extension SafarishViewController {
 		} else {
 			
 		}
-
 	}
 }

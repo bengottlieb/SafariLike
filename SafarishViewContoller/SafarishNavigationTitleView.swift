@@ -139,7 +139,6 @@ class SafarishNavigationURLView: UIView, SafarishNavigationTitleView {
 
 			self.urlField.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
 			self.urlField.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor, constant: 20).isActive = true
-			self.urlField.heightAnchor.constraint(equalToConstant: 44).isActive = true
 
 			self.leftToolbar.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
 			self.leftToolbar.trailingAnchor.constraint(equalTo: self.urlField.leadingAnchor, constant: 0).isActive = true
@@ -158,7 +157,6 @@ class SafarishNavigationURLView: UIView, SafarishNavigationTitleView {
 			self.rightToolbarWidthConstraint = self.rightToolbar.widthAnchor.constraint(equalToConstant: 100)
 			self.rightToolbarWidthConstraint.isActive = true
 		} else {
-			self.urlField.heightAnchor.constraint(equalToConstant: 44).isActive = true
 			self.urlField.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
 			self.urlField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
 			self.urlField.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -18).isActive = true

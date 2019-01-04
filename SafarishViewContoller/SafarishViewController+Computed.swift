@@ -10,14 +10,23 @@ import UIKit
 import WebKit
 
 extension SafarishViewController {
-	var toolbarHeight: CGFloat { return 44 }
-	open var topBarMaxHeight: CGFloat { return self.toolbarHeight }
+	var topbarHeight: CGFloat { return 50 }
+	open var topBarMaxHeight: CGFloat { return self.topbarHeight }
 	
-	var toolbarFrame: CGRect {
-		let height = self.topBarCurrentHeight ?? self.toolbarHeight
+	var topbarFrame: CGRect {
+		let height = self.topBarCurrentHeight ?? self.topbarHeight
 		return CGRect(x: 0, y: 0, width: self.view.bounds.width, height: self.view.safeAreaInsets.top + height)
 	}
 	
+	var forwardButtonEnabled: Bool {
+		get { return self.pageForwardButtonItem.isEnabled }
+		set { self.pageForwardButtonItem.isEnabled = newValue }
+	}
+	var backButtonEnabled: Bool {
+		get { return self.pageBackButtonItem.isEnabled }
+		set { self.pageBackButtonItem.isEnabled = newValue }
+	}
+
 	var webviewFrame: CGRect {
 		let topHeight = self.topBarMaxHeight + self.view.safeAreaInsets.top
 		var frame = self.view.bounds

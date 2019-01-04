@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B518E4D221DE1F5F00BF8BAE /* SafarishNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B518E4D121DE1F5E00BF8BAE /* SafarishNavigationBar.swift */; };
+		B518E4D421DE32F900BF8BAE /* SafarishButtonContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B518E4D321DE32F900BF8BAE /* SafarishButtonContainer.swift */; };
+		B518E4D621DE77D000BF8BAE /* SafarishViewController+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B518E4D521DE77D000BF8BAE /* SafarishViewController+Actions.swift */; };
 		B5815CF81F2B4A5F007541AE /* SafarishNavigationTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */; };
 		B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */; };
 		B58FE34E1E06E05800C46CD8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58FE34D1E06E05800C46CD8 /* ViewController.swift */; };
@@ -39,6 +42,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B518E4D121DE1F5E00BF8BAE /* SafarishNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishNavigationBar.swift; sourceTree = "<group>"; };
+		B518E4D321DE32F900BF8BAE /* SafarishButtonContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishButtonContainer.swift; sourceTree = "<group>"; };
+		B518E4D521DE77D000BF8BAE /* SafarishViewController+Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SafarishViewController+Actions.swift"; sourceTree = "<group>"; };
 		B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafarishNavigationTitleView.swift; sourceTree = "<group>"; };
 		B58FE3481E06E05800C46CD8 /* Safarish.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Safarish.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B58FE34B1E06E05800C46CD8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -117,7 +123,10 @@
 				B5F68C0321DB82C0008FB9FE /* SafarishViewController+Setup.swift */,
 				B5F68C0521DB8D79008FB9FE /* SafarishViewController+Overrides.swift */,
 				B5F68C0121DB8256008FB9FE /* SafarishViewController+Computed.swift */,
+				B518E4D521DE77D000BF8BAE /* SafarishViewController+Actions.swift */,
 				B5F68C0721DB926C008FB9FE /* SafarishViewController+Delegates.swift */,
+				B518E4D121DE1F5E00BF8BAE /* SafarishNavigationBar.swift */,
+				B518E4D321DE32F900BF8BAE /* SafarishButtonContainer.swift */,
 				B5C7F3761E14127200D1E245 /* NavBarSafarishViewController.swift */,
 				B5815CF71F2B4A5F007541AE /* SafarishNavigationTitleView.swift */,
 				B5DD3ADD1F2AA9D8000519FB /* SafarishURLEntryField.swift */,
@@ -212,8 +221,11 @@
 				B5F68C0421DB82C0008FB9FE /* SafarishViewController+Setup.swift in Sources */,
 				B5C7F37A1E14127200D1E245 /* NavBarSafarishViewController.swift in Sources */,
 				B5815CF81F2B4A5F007541AE /* SafarishNavigationTitleView.swift in Sources */,
+				B518E4D221DE1F5F00BF8BAE /* SafarishNavigationBar.swift in Sources */,
 				B5F68BDF21DABD0F008FB9FE /* NavBarSafarishViewController+SubNavViews.swift in Sources */,
 				B5F68C0821DB926C008FB9FE /* SafarishViewController+Delegates.swift in Sources */,
+				B518E4D621DE77D000BF8BAE /* SafarishViewController+Actions.swift in Sources */,
+				B518E4D421DE32F900BF8BAE /* SafarishButtonContainer.swift in Sources */,
 				B5E36BCC1F2BB252004D357A /* URL+Safarish.swift in Sources */,
 				B5F68C0221DB8256008FB9FE /* SafarishViewController+Computed.swift in Sources */,
 				B58FE34C1E06E05800C46CD8 /* AppDelegate.swift in Sources */,

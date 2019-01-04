@@ -18,12 +18,16 @@ open class SafarishViewController: UIViewController {
 	}}
 	var titleView: SafarishURLEntryField!
 	
-	var toolbar: UIToolbar!
+	var topbar: SafarishNavigationBar!
 	var webview: WKWebView!
 	var topBarCurrentHeight: CGFloat?
+	var localScrollMinimum: CGFloat = 0
 	
 	var state: State = .idle
-	
+	open lazy var pageBackButtonItem: UIBarButtonItem = { return UIBarButtonItem(image: UIImage(named: "safarish-page-back", in: Bundle(for: SafarishViewController.self), compatibleWith: nil), style: .plain, target: self, action: #selector(pageBack)) }()
+	open lazy var pageForwardButtonItem: UIBarButtonItem = { return UIBarButtonItem(image: UIImage(named: "safarish-page-forward", in: Bundle(for: SafarishViewController.self), compatibleWith: nil), style: .plain, target: self, action: #selector(pageForward)) }()
+	open lazy var doneButtonItem: UIBarButtonItem = { return UIBarButtonItem(title: NSLocalizedString("Done", comment: "Done"), style: .plain, target: self, action: #selector(done)) }()
+
 	public convenience init(url: URL?) {
 		self.init()
 		if let url = url {
@@ -58,7 +62,7 @@ open class SafarishViewController: UIViewController {
 	}
 	
 	func didEnterURL(_ url: URL) {
-		
+		self.webview.load(URLRequest(url: url))
 	}
 	
 }

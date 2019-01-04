@@ -20,7 +20,7 @@ extension SafarishViewController {
 	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
 		
-		self.toolbar?.frame = self.toolbarFrame
+		self.topbar?.frame = self.topbarFrame
 		self.webview?.frame = self.webviewFrame
 	}
 }

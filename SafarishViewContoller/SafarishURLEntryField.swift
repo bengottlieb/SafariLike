@@ -79,6 +79,8 @@ class SafarishURLEntryField: UIView {
 		self.backgroundRightConstraint = self.fieldBackground.trailingAnchor.constraint(equalTo: self.trailingAnchor)
 		self.backgroundRightConstraint.isActive = true
 		
+		self.heightAnchor.constraint(equalToConstant: 44).isActive = true
+		self.widthAnchor.constraint(greaterThanOrEqualToConstant: 300).isActive = true
 		self.fieldBackground.heightAnchor.constraint(equalToConstant: self.backgroundHeight).isActive = true
 		self.fieldBackground.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
 		self.fieldBackground.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
@@ -142,8 +144,8 @@ class SafarishURLEntryField: UIView {
 	func updateShrinkage() {
 		let newAlpha = (1.0 - self.shrinkPercentage) * (1.0 - self.shrinkPercentage)
 		self.fieldBackground.alpha = self.drawBackground ? newAlpha : 0.0
-		self.label.transform = CGAffineTransform(translationX: 0, y: 10 * self.shrinkPercentage)
-		self.fieldBackground.transform = CGAffineTransform(translationX: 0, y: 10 * self.shrinkPercentage)
+//		self.label.transform = CGAffineTransform(translationX: 0, y: 10 * self.shrinkPercentage)
+//		self.fieldBackground.transform = CGAffineTransform(translationX: 0, y: 10 * self.shrinkPercentage)
 
 		let minFontSize: CGFloat = 10
 		self.label.font = UIFont.systemFont(ofSize: minFontSize + (self.fontSize - minFontSize) * (1 - self.shrinkPercentage))
